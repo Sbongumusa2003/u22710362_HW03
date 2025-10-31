@@ -156,17 +156,16 @@
                 <input type="text" class="form-control form-control-sm" id="staff_id" readonly>
             </div>
             <div class="form-row">
-                <label>.....</label>
-                <input type="text" class="form-control form-control-sm">
+                <label>Email</label>
+                <input type="text" class="form-control form-control-sm" id="staff_email" readonly>
             </div>
 
             <div class="list-box">
                 <ul id="staffList">
                     @foreach (var staff in Model.Staffs.Take(5))
                     {
-                        <li>Sold Item @staff.first_name @staff.last_name</li>
+                        <li>@staff.first_name @staff.last_name - @staff.stores.store_name</li>
                     }
-                    <li>.....</li>
                 </ul>
             </div>
 
@@ -202,17 +201,16 @@
                 <input type="text" class="form-control form-control-sm" id="customer_id" readonly>
             </div>
             <div class="form-row">
-                <label>.....</label>
-                <input type="text" class="form-control form-control-sm">
+                <label>Email</label>
+                <input type="text" class="form-control form-control-sm" id="customer_email" readonly>
             </div>
 
             <div class="list-box">
                 <ul id="customerList">
                     @foreach (var customer in Model.Customers.Take(5))
                     {
-                        <li>Purchased Item @customer.first_name @customer.last_name</li>
+                        <li>@customer.first_name @customer.last_name - @customer.city</li>
                     }
-                    <li>.....</li>
                 </ul>
             </div>
 
@@ -247,21 +245,30 @@
             <div class="product-details">
                 <div class="product-form">
                     <div class="form-row">
-                        <label>Product details</label>
+                        <label>Product Name</label>
+                        <input type="text" class="form-control form-control-sm" id="product_name" readonly>
                     </div>
                     <div class="form-row">
-                        <input type="text" class="form-control form-control-sm" placeholder="Product Name">
+                        <label>Model Year</label>
+                        <input type="text" class="form-control form-control-sm" id="product_year" readonly>
                     </div>
                     <div class="form-row">
-                        <input type="text" class="form-control form-control-sm" placeholder="Model Year">
-                    </div>
-                    <div class="form-row">
-                        <input type="text" class="form-control form-control-sm" placeholder="Price">
+                        <label>Price</label>
+                        <input type="text" class="form-control form-control-sm" id="product_price" readonly>
                     </div>
                 </div>
                 <div class="product-image">
                     <span>Bicycle image</span>
                 </div>
+            </div>
+
+            <div class="list-box" style="margin-top: 10px;">
+                <ul id="productList">
+                    @foreach (var product in Model.Products.Take(5))
+                    {
+                        <li>@product.product_name - $@product.list_price</li>
+                    }
+                </ul>
             </div>
         </div>
     </div>
@@ -279,15 +286,15 @@
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">First Name</label>
+                        <label class="form-label">First Name *</label>
                         <input type="text" class="form-control" name="first_name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Last Name</label>
+                        <label class="form-label">Last Name *</label>
                         <input type="text" class="form-control" name="last_name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Email *</label>
                         <input type="email" class="form-control" name="email" required>
                     </div>
                     <div class="mb-3">
@@ -295,18 +302,29 @@
                         <input type="text" class="form-control" name="phone">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Active</label>
+                        <label class="form-label">Active *</label>
                         <select class="form-select" name="active" required>
                             <option value="1">Yes</option>
                             <option value="0">No</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Store</label>
+                        <label class="form-label">Store *</label>
                         <select class="form-select" name="store_id" required>
+                            <option value="">Select Store</option>
                             @foreach (var store in ViewBag.Stores)
                             {
                                 <option value="@store.store_id">@store.store_name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Manager (Optional)</label>
+                        <select class="form-select" name="manager_id">
+                            <option value="">No Manager</option>
+                            @foreach (var staff in Model.Staffs)
+                            {
+                                <option value="@staff.staff_id">@staff.first_name @staff.last_name</option>
                             }
                         </select>
                     </div>
@@ -332,15 +350,15 @@
                 @Html.AntiForgeryToken()
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">First Name</label>
+                        <label class="form-label">First Name *</label>
                         <input type="text" class="form-control" name="first_name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Last Name</label>
+                        <label class="form-label">Last Name *</label>
                         <input type="text" class="form-control" name="last_name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">Email *</label>
                         <input type="email" class="form-control" name="email" required>
                     </div>
                     <div class="mb-3">
@@ -361,7 +379,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Zip Code</label>
-                        <input type="text" class="form-control" name="zip_code">
+                        <input type="text" class="form-control" name="zip_code" maxlength="5">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -376,10 +394,11 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Create Staff Form Submit
             $('#createStaffForm').submit(function (e) {
                 e.preventDefault();
                 var submitBtn = $(this).find('button[type="submit"]');
-                submitBtn.prop('disabled', true);
+                submitBtn.prop('disabled', true).text('Saving...');
 
                 $.ajax({
                     url: '@Url.Action("CreateStaff", "Home")',
@@ -387,47 +406,69 @@
                     data: $(this).serialize(),
                     success: function (response) {
                         if (response.success) {
-                            alert('Staff created successfully!');
+                            alert(response.message || 'Staff created successfully!');
                             $('#createStaffModal').modal('hide');
                             location.reload();
                         } else {
-                            alert('Failed to create staff.');
-                            submitBtn.prop('disabled', false);
+                            alert(response.message || 'Failed to create staff.');
+                            submitBtn.prop('disabled', false).text('Save Staff');
                         }
                     },
-                    error: function() {
-                        alert('An error occurred.');
-                        submitBtn.prop('disabled', false);
+                    error: function(xhr) {
+                        alert('An error occurred: ' + (xhr.responseText || 'Unknown error'));
+                        submitBtn.prop('disabled', false).text('Save Staff');
                     }
                 });
             });
 
+            // Create Customer Form Submit
             $('#createCustomerForm').submit(function (e) {
                 e.preventDefault();
+                var submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true).text('Saving...');
+
                 $.ajax({
                     url: '@Url.Action("CreateCustomer", "Home")',
                     type: 'POST',
                     data: $(this).serialize(),
                     success: function (response) {
                         if (response.success) {
-                            alert('Customer created successfully!');
+                            alert(response.message || 'Customer created successfully!');
+                            $('#createCustomerModal').modal('hide');
                             location.reload();
                         } else {
-                            alert('Failed to create customer.');
+                            alert(response.message || 'Failed to create customer.');
+                            submitBtn.prop('disabled', false).text('Save Customer');
                         }
+                    },
+                    error: function(xhr) {
+                        alert('An error occurred: ' + (xhr.responseText || 'Unknown error'));
+                        submitBtn.prop('disabled', false).text('Save Customer');
                     }
                 });
             });
 
+            // Filter Products
             $('#filterBtn').click(function () {
                 var brandId = $('#brandFilter').val();
+
                 $.ajax({
                     url: '@Url.Action("FilterProducts", "Home")',
                     type: 'GET',
                     data: { brandId: brandId },
                     success: function (data) {
-                        // Update product display with filtered data
-                        console.log(data);
+                        if (data && data.length > 0) {
+                            var html = '';
+                            data.forEach(function(product) {
+                                html += '<li>' + product.product_name + ' - $' + product.list_price + '</li>';
+                            });
+                            $('#productList').html(html);
+                        } else {
+                            $('#productList').html('<li>No products found</li>');
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to filter products');
                     }
                 });
             });
