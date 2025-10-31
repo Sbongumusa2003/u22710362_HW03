@@ -4,355 +4,221 @@
     ViewBag.Title = "Maintain - Bike Store Management";
 }
 
-<div class="container mt-4">
-    <h1 class="text-center mb-4">Maintain Records</h1>
+<style>
+    .section-container {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
 
-    <!-- Staff Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Staff Members</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>Store</th>
-                                    <th>Active</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var staff in Model.Staffs)
-                                {
-                                    <tr>
-                                        <td>@staff.first_name @staff.last_name</td>
-                                        <td>@staff.email</td>
-                                        <td>@staff.phone</td>
-                                        <td>@staff.stores?.store_name</td>
-                                        <td>@(staff.active == 1 ? "Yes" : "No")</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning edit-staff" data-id="@staff.staff_id">Edit</button>
-                                            <button class="btn btn-sm btn-info details-staff" data-id="@staff.staff_id">Details</button>
-                                            <button class="btn btn-sm btn-danger delete-staff" data-id="@staff.staff_id">Delete</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+    .section-box {
+        flex: 1;
+        border: 2px solid #ccc;
+        padding: 15px;
+        background-color: #f9f9f9;
+    }
+
+        .section-box h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #333;
+        }
+
+    .form-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+
+        .form-row label {
+            flex: 0 0 100px;
+            margin: 0;
+        }
+
+        .form-row input,
+        .form-row select {
+            flex: 1;
+        }
+
+    .list-box {
+        border: 1px solid #999;
+        padding: 10px;
+        min-height: 150px;
+        background-color: white;
+        margin-top: 10px;
+    }
+
+        .list-box ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .list-box li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    .product-details {
+        display: flex;
+        gap: 20px;
+    }
+
+    .product-form {
+        flex: 1;
+    }
+
+    .product-image {
+        flex: 0 0 200px;
+        border: 1px solid #999;
+        height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: white;
+    }
+
+    .dropdown-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <h2>Maintain</h2>
+
+    <div class="section-container">
+        <!-- Staff Section -->
+        <div class="section-box">
+            <div class="dropdown-label">
+                <select class="form-select form-select-sm" style="width: auto;" id="staffListDropdown">
+                    <option>Staff list</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>First Name</label>
+                <input type="text" class="form-control form-control-sm" id="maintain_staff_first_name">
+            </div>
+            <div class="form-row">
+                <label>Last Name</label>
+                <input type="text" class="form-control form-control-sm" id="maintain_staff_last_name">
+            </div>
+            <div class="form-row">
+                <label>Staff id</label>
+                <input type="text" class="form-control form-control-sm" id="maintain_staff_id" readonly>
+            </div>
+            <div class="form-row">
+                <label>.....</label>
+                <input type="text" class="form-control form-control-sm">
+            </div>
+
+            <div class="list-box">
+                <ul id="maintainStaffList">
+                    @foreach (var staff in Model.Staffs.Take(5))
+                    {
+                        <li class="staff-item" data-id="@staff.staff_id" style="cursor: pointer;">
+                            Sold Item @staff.first_name @staff.last_name
+                        </li>
+                    }
+                    <li>.....</li>
+                </ul>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-sm btn-warning" id="editStaffBtn">Edit</button>
+                <button class="btn btn-sm btn-primary" id="updateStaffBtn">Update</button>
+                <button class="btn btn-sm btn-danger" id="deleteStaffBtn">Delete</button>
             </div>
         </div>
-    </div>
 
-    <!-- Customers Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-success text-white">
-                    <h3 class="mb-0">Customers</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Phone</th>
-                                    <th>City</th>
-                                    <th>State</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var customer in Model.Customers)
-                                {
-                                    <tr>
-                                        <td>@customer.first_name @customer.last_name</td>
-                                        <td>@customer.email</td>
-                                        <td>@customer.phone</td>
-                                        <td>@customer.city</td>
-                                        <td>@customer.state</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning edit-customer" data-id="@customer.customer_id">Edit</button>
-                                            <button class="btn btn-sm btn-info details-customer" data-id="@customer.customer_id">Details</button>
-                                            <button class="btn btn-sm btn-danger delete-customer" data-id="@customer.customer_id">Delete</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <!-- Customers Section -->
+        <div class="section-box">
+            <div class="dropdown-label">
+                <select class="form-select form-select-sm" style="width: auto;" id="customerListDropdown">
+                    <option>Customer list</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <label>First Name</label>
+                <input type="text" class="form-control form-control-sm" id="maintain_customer_first_name">
+            </div>
+            <div class="form-row">
+                <label>Last Name</label>
+                <input type="text" class="form-control form-control-sm" id="maintain_customer_last_name">
+            </div>
+            <div class="form-row">
+                <label>Customer id</label>
+                <input type="text" class="form-control form-control-sm" id="maintain_customer_id" readonly>
+            </div>
+            <div class="form-row">
+                <label>.....</label>
+                <input type="text" class="form-control form-control-sm">
+            </div>
+
+            <div class="list-box">
+                <ul id="maintainCustomerList">
+                    @foreach (var customer in Model.Customers.Take(5))
+                    {
+                        <li class="customer-item" data-id="@customer.customer_id" style="cursor: pointer;">
+                            Purchased Item @customer.first_name @customer.last_name
+                        </li>
+                    }
+                    <li>.....</li>
+                </ul>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-sm btn-warning" id="editCustomerBtn">Edit</button>
+                <button class="btn btn-sm btn-primary" id="updateCustomerBtn">Update</button>
+                <button class="btn btn-sm btn-danger" id="deleteCustomerBtn">Delete</button>
             </div>
         </div>
-    </div>
 
-    <!-- Products Section -->
-    <div class="row mb-5">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header bg-info text-white">
-                    <h3 class="mb-0">Products (Bicycles)</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Brand</th>
-                                    <th>Category</th>
-                                    <th>Model Year</th>
-                                    <th>Price</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var product in Model.Products)
-                                {
-                                    <tr>
-                                        <td>@product.product_name</td>
-                                        <td>@product.brands?.brand_name</td>
-                                        <td>@product.categories?.category_name</td>
-                                        <td>@product.model_year</td>
-                                        <td>$@product.list_price</td>
-                                        <td>
-                                            <button class="btn btn-sm btn-warning edit-product" data-id="@product.product_id">Edit</button>
-                                            <button class="btn btn-sm btn-info details-product" data-id="@product.product_id">Details</button>
-                                            <button class="btn btn-sm btn-danger delete-product" data-id="@product.product_id">Delete</button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        <!-- Products Section -->
+        <div class="section-box">
+            <div class="dropdown-label">
+                <select class="form-select form-select-sm" style="width: auto;" id="productListDropdown">
+                    <option>Product list</option>
+                </select>
+                <button type="button" class="btn btn-sm btn-secondary" id="maintainFilterBtn">Filter</button>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- Edit Staff Modal -->
-<div class="modal fade" id="editStaffModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Staff</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="product-details">
+                <div class="product-form">
+                    <div class="form-row">
+                        <label>Product details</label>
+                    </div>
+                    <div class="form-row">
+                        <input type="text" class="form-control form-control-sm" id="maintain_product_name" placeholder="Product Name">
+                    </div>
+                    <div class="form-row">
+                        <input type="text" class="form-control form-control-sm" id="maintain_product_year" placeholder="Model Year">
+                    </div>
+                    <div class="form-row">
+                        <input type="text" class="form-control form-control-sm" id="maintain_product_price" placeholder="Price">
+                    </div>
+                </div>
+                <div class="product-image">
+                    <span>Bicycle image</span>
+                </div>
             </div>
-            <form id="editStaffForm">
-                @Html.AntiForgeryToken()
-                <input type="hidden" id="edit_staff_id" name="staff_id">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="edit_staff_first_name" name="first_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="edit_staff_last_name" name="last_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="edit_staff_email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone</label>
-                        <input type="text" class="form-control" id="edit_staff_phone" name="phone">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Active</label>
-                        <select class="form-select" id="edit_staff_active" name="active" required>
-                            <option value="1">Yes</option>
-                            <option value="0">No</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Store</label>
-                        <select class="form-select" id="edit_staff_store_id" name="store_id" required>
-                            @foreach (var store in ViewBag.Stores)
-                            {
-                                <option value="@store.store_id">@store.store_name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Manager</label>
-                        <select class="form-select" id="edit_staff_manager_id" name="manager_id">
-                            <option value="">None</option>
-                            @foreach (var manager in ViewBag.Managers)
-                            {
-                                <option value="@manager.staff_id">@manager.first_name @manager.last_name</option>
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Details Staff Modal -->
-<div class="modal fade" id="detailsStaffModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Staff Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="staffDetailsContent"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Customer Modal -->
-<div class="modal fade" id="editCustomerModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Customer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="editCustomerForm">
-                @Html.AntiForgeryToken()
-                <input type="hidden" id="edit_customer_id" name="customer_id">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="edit_customer_first_name" name="first_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="edit_customer_last_name" name="last_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-control" id="edit_customer_email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Phone</label>
-                        <input type="text" class="form-control" id="edit_customer_phone" name="phone">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Street</label>
-                        <input type="text" class="form-control" id="edit_customer_street" name="street">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">City</label>
-                        <input type="text" class="form-control" id="edit_customer_city" name="city">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">State</label>
-                        <input type="text" class="form-control" id="edit_customer_state" name="state">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Zip Code</label>
-                        <input type="text" class="form-control" id="edit_customer_zip_code" name="zip_code">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Details Customer Modal -->
-<div class="modal fade" id="detailsCustomerModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Customer Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="customerDetailsContent"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Product Modal -->
-<div class="modal fade" id="editProductModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Edit Product</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="editProductForm">
-                @Html.AntiForgeryToken()
-                <input type="hidden" id="edit_product_id" name="product_id">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Product Name</label>
-                        <input type="text" class="form-control" id="edit_product_name" name="product_name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Brand</label>
-                        <select class="form-select" id="edit_product_brand_id" name="brand_id" required>
-                            @foreach (var brand in ViewBag.Brands)
-                            {
-                                <option value="@brand.brand_id">@brand.brand_name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Category</label>
-                        <select class="form-select" id="edit_product_category_id" name="category_id" required>
-                            @foreach (var category in ViewBag.Categories)
-                            {
-                                <option value="@category.category_id">@category.category_name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Model Year</label>
-                        <input type="number" class="form-control" id="edit_product_model_year" name="model_year" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">List Price</label>
-                        <input type="number" step="0.01" class="form-control" id="edit_product_list_price" name="list_price" required>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Details Product Modal -->
-<div class="modal fade" id="detailsProductModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Product Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="productDetailsContent"></div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <div class="action-buttons">
+                <button class="btn btn-sm btn-warning" id="editProductBtn">Edit</button>
+                <button class="btn btn-sm btn-primary" id="updateProductBtn">Update</button>
+                <button class="btn btn-sm btn-danger" id="deleteProductBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -361,28 +227,41 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Edit Staff
-            $('.edit-staff').click(function () {
-                var id = $(this).data('id');
-                $.get('@Url.Action("GetStaff", "Maintain")/' + id, function (data) {
-                    $('#edit_staff_id').val(data.staff_id);
-                    $('#edit_staff_first_name').val(data.first_name);
-                    $('#edit_staff_last_name').val(data.last_name);
-                    $('#edit_staff_email').val(data.email);
-                    $('#edit_staff_phone').val(data.phone);
-                    $('#edit_staff_active').val(data.active);
-                    $('#edit_staff_store_id').val(data.store_id);
-                    $('#edit_staff_manager_id').val(data.manager_id || '');
-                    $('#editStaffModal').modal('show');
+            var selectedStaffId = null;
+            var selectedCustomerId = null;
+            var selectedProductId = null;
+
+            // Staff item click
+            $('.staff-item').click(function () {
+                selectedStaffId = $(this).data('id');
+                $('.staff-item').css('background-color', '');
+                $(this).css('background-color', '#e3f2fd');
+
+                $.get('@Url.Action("GetStaff", "Maintain")/' + selectedStaffId, function (data) {
+                    $('#maintain_staff_first_name').val(data.first_name);
+                    $('#maintain_staff_last_name').val(data.last_name);
+                    $('#maintain_staff_id').val(data.staff_id);
                 });
             });
 
-            $('#editStaffForm').submit(function (e) {
-                e.preventDefault();
+            // Update Staff
+            $('#updateStaffBtn').click(function () {
+                if (!selectedStaffId) {
+                    alert('Please select a staff member first');
+                    return;
+                }
+
+                var data = {
+                    staff_id: selectedStaffId,
+                    first_name: $('#maintain_staff_first_name').val(),
+                    last_name: $('#maintain_staff_last_name').val(),
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                };
+
                 $.ajax({
                     url: '@Url.Action("EditStaff", "Maintain")',
                     type: 'POST',
-                    data: $(this).serialize(),
+                    data: data,
                     success: function (response) {
                         if (response.success) {
                             alert('Staff updated successfully!');
@@ -394,29 +273,21 @@
                 });
             });
 
-            // Details Staff
-            $('.details-staff').click(function () {
-                var id = $(this).data('id');
-                $.get('@Url.Action("GetStaff", "Maintain")/' + id, function (data) {
-                    var content = '<dl class="row">' +
-                        '<dt class="col-sm-4">Name:</dt><dd class="col-sm-8">' + data.first_name + ' ' + data.last_name + '</dd>' +
-                        '<dt class="col-sm-4">Email:</dt><dd class="col-sm-8">' + data.email + '</dd>' +
-                        '<dt class="col-sm-4">Phone:</dt><dd class="col-sm-8">' + (data.phone || 'N/A') + '</dd>' +
-                        '<dt class="col-sm-4">Active:</dt><dd class="col-sm-8">' + (data.active == 1 ? 'Yes' : 'No') + '</dd>' +
-                        '</dl>';
-                    $('#staffDetailsContent').html(content);
-                    $('#detailsStaffModal').modal('show');
-                });
-            });
-
             // Delete Staff
-            $('.delete-staff').click(function () {
+            $('#deleteStaffBtn').click(function () {
+                if (!selectedStaffId) {
+                    alert('Please select a staff member first');
+                    return;
+                }
+
                 if (confirm('Are you sure you want to delete this staff member?')) {
-                    var id = $(this).data('id');
                     $.ajax({
                         url: '@Url.Action("DeleteStaff", "Maintain")',
                         type: 'POST',
-                        data: { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                        data: {
+                            id: selectedStaffId,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
                         success: function (response) {
                             if (response.success) {
                                 alert('Staff deleted successfully!');
@@ -429,29 +300,37 @@
                 }
             });
 
-            // Edit Customer
-            $('.edit-customer').click(function () {
-                var id = $(this).data('id');
-                $.get('@Url.Action("GetCustomer", "Maintain")/' + id, function (data) {
-                    $('#edit_customer_id').val(data.customer_id);
-                    $('#edit_customer_first_name').val(data.first_name);
-                    $('#edit_customer_last_name').val(data.last_name);
-                    $('#edit_customer_email').val(data.email);
-                    $('#edit_customer_phone').val(data.phone);
-                    $('#edit_customer_street').val(data.street);
-                    $('#edit_customer_city').val(data.city);
-                    $('#edit_customer_state').val(data.state);
-                    $('#edit_customer_zip_code').val(data.zip_code);
-                    $('#editCustomerModal').modal('show');
+            // Customer item click
+            $('.customer-item').click(function () {
+                selectedCustomerId = $(this).data('id');
+                $('.customer-item').css('background-color', '');
+                $(this).css('background-color', '#e3f2fd');
+
+                $.get('@Url.Action("GetCustomer", "Maintain")/' + selectedCustomerId, function (data) {
+                    $('#maintain_customer_first_name').val(data.first_name);
+                    $('#maintain_customer_last_name').val(data.last_name);
+                    $('#maintain_customer_id').val(data.customer_id);
                 });
             });
 
-            $('#editCustomerForm').submit(function (e) {
-                e.preventDefault();
+            // Update Customer
+            $('#updateCustomerBtn').click(function () {
+                if (!selectedCustomerId) {
+                    alert('Please select a customer first');
+                    return;
+                }
+
+                var data = {
+                    customer_id: selectedCustomerId,
+                    first_name: $('#maintain_customer_first_name').val(),
+                    last_name: $('#maintain_customer_last_name').val(),
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                };
+
                 $.ajax({
                     url: '@Url.Action("EditCustomer", "Maintain")',
                     type: 'POST',
-                    data: $(this).serialize(),
+                    data: data,
                     success: function (response) {
                         if (response.success) {
                             alert('Customer updated successfully!');
@@ -463,100 +342,27 @@
                 });
             });
 
-            // Details Customer
-            $('.details-customer').click(function () {
-                var id = $(this).data('id');
-                $.get('@Url.Action("GetCustomer", "Maintain")/' + id, function (data) {
-                    var content = '<dl class="row">' +
-                        '<dt class="col-sm-4">Name:</dt><dd class="col-sm-8">' + data.first_name + ' ' + data.last_name + '</dd>' +
-                        '<dt class="col-sm-4">Email:</dt><dd class="col-sm-8">' + data.email + '</dd>' +
-                        '<dt class="col-sm-4">Phone:</dt><dd class="col-sm-8">' + (data.phone || 'N/A') + '</dd>' +
-                        '<dt class="col-sm-4">Address:</dt><dd class="col-sm-8">' + (data.street || '') + ', ' + (data.city || '') + ', ' + (data.state || '') + ' ' + (data.zip_code || '') + '</dd>' +
-                        '</dl>';
-                    $('#customerDetailsContent').html(content);
-                    $('#detailsCustomerModal').modal('show');
-                });
-            });
-
             // Delete Customer
-            $('.delete-customer').click(function () {
+            $('#deleteCustomerBtn').click(function () {
+                if (!selectedCustomerId) {
+                    alert('Please select a customer first');
+                    return;
+                }
+
                 if (confirm('Are you sure you want to delete this customer?')) {
-                    var id = $(this).data('id');
                     $.ajax({
                         url: '@Url.Action("DeleteCustomer", "Maintain")',
                         type: 'POST',
-                        data: { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
+                        data: {
+                            id: selectedCustomerId,
+                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                        },
                         success: function (response) {
                             if (response.success) {
                                 alert('Customer deleted successfully!');
                                 location.reload();
                             } else {
                                 alert('Failed to delete customer.');
-                            }
-                        }
-                    });
-                }
-            });
-
-            // Edit Product
-            $('.edit-product').click(function () {
-                var id = $(this).data('id');
-                $.get('@Url.Action("GetProduct", "Maintain")/' + id, function (data) {
-                    $('#edit_product_id').val(data.product_id);
-                    $('#edit_product_name').val(data.product_name);
-                    $('#edit_product_brand_id').val(data.brand_id);
-                    $('#edit_product_category_id').val(data.category_id);
-                    $('#edit_product_model_year').val(data.model_year);
-                    $('#edit_product_list_price').val(data.list_price);
-                    $('#editProductModal').modal('show');
-                });
-            });
-
-            $('#editProductForm').submit(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: '@Url.Action("EditProduct", "Maintain")',
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function (response) {
-                        if (response.success) {
-                            alert('Product updated successfully!');
-                            location.reload();
-                        } else {
-                            alert('Failed to update product.');
-                        }
-                    }
-                });
-            });
-
-            // Details Product
-            $('.details-product').click(function () {
-                var id = $(this).data('id');
-                $.get('@Url.Action("GetProduct", "Maintain")/' + id, function (data) {
-                    var content = '<dl class="row">' +
-                        '<dt class="col-sm-4">Product Name:</dt><dd class="col-sm-8">' + data.product_name + '</dd>' +
-                        '<dt class="col-sm-4">Model Year:</dt><dd class="col-sm-8">' + data.model_year + '</dd>' +
-                        '<dt class="col-sm-4">List Price:</dt><dd class="col-sm-8">$' + data.list_price + '</dd>' +
-                        '</dl>';
-                    $('#productDetailsContent').html(content);
-                    $('#detailsProductModal').modal('show');
-                });
-            });
-
-            // Delete Product
-            $('.delete-product').click(function () {
-                if (confirm('Are you sure you want to delete this product?')) {
-                    var id = $(this).data('id');
-                    $.ajax({
-                        url: '@Url.Action("DeleteProduct", "Maintain")',
-                        type: 'POST',
-                        data: { id: id, __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val() },
-                        success: function (response) {
-                            if (response.success) {
-                                alert('Product deleted successfully!');
-                                location.reload();
-                            } else {
-                                alert('Failed to delete product.');
                             }
                         }
                     });
