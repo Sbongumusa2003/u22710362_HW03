@@ -80,6 +80,7 @@ namespace u22710362_HW03.Controllers
         public async Task<ActionResult> GetSalesReport()
         {
             var salesData = await db.order_items
+                .Include(oi => oi.products.brands) // Eager loading
                 .GroupBy(oi => oi.products.brands.brand_name)
                 .Select(g => new
                 {

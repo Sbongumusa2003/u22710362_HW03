@@ -264,22 +264,34 @@
     <script>
         $(document).ready(function () {
             // Create Staff Form Submit
-            $('#createStaffForm').submit(function (e) {
-                e.preventDefault();
-                $.ajax({
-                    url: '@Url.Action("CreateStaff", "Home")',
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function (response) {
-                        if (response.success) {
-                            alert('Staff created successfully!');
-                            location.reload();
-                        } else {
-                            alert('Failed to create staff.');
-                        }
-                    }
-                });
-            });
+            // Replace form submit handlers with better error handling
+$('#createStaffForm').submit(function (e) {
+    e.preventDefault();
+
+    // Disable submit button to prevent double submission
+    var submitBtn = $(this).find('button[type="submit"]');
+    submitBtn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Saving...');
+
+    $.ajax({
+        url: '@Url.Action("CreateStaff", "Home")',
+        type: 'POST',
+        data: $(this).serialize(),
+        success: function (response) {
+            if (response.success) {
+                alert('Staff created successfully!');
+                $('#createStaffModal').modal('hide');
+                location.reload();
+            } else {
+                alert('Failed to create staff. Please check all required fields.');
+                submitBtn.prop('disabled', false).html('Save Staff');
+            }
+        },
+        error: function() {
+            alert('An error occurred. Please try again.');
+            submitBtn.prop('disabled', false).html('Save Staff');
+        }
+    });
+});
 
             // Create Customer Form Submit
             $('#createCustomerForm').submit(function (e) {
@@ -301,34 +313,41 @@
 
             // Filter Products
             $('#filterBtn').click(function () {
-                var brandId = $('#brandFilter').val();
-                var categoryId = $('#categoryFilter').val();
+    var brandId = $('#brandFilter').val();
+    var categoryId = $('#categoryFilter').val();
 
-                $.ajax({
-                    url: '@Url.Action("FilterProducts", "Home")',
-                    type: 'GET',
-                    data: { brandId: brandId, categoryId: categoryId },
-                    success: function (data) {
-                        var tbody = $('#productsTable tbody');
-                        tbody.empty();
+    // Show loading indicator
+    var tbody = $('#productsTable tbody');
+    tbody.html('<tr><td colspan="5" class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>');
 
-                        if (data.length === 0) {
-                            tbody.append('<tr><td colspan="5" class="text-center">No products found</td></tr>');
-                        } else {
-                            $.each(data, function (i, product) {
-                                var row = '<tr>' +
-                                    '<td>' + product.product_name + '</td>' +
-                                    '<td>' + product.brand_name + '</td>' +
-                                    '<td>' + product.category_name + '</td>' +
-                                    '<td>' + product.model_year + '</td>' +
-                                    '<td>$' + product.list_price + '</td>' +
-                                    '</tr>';
-                                tbody.append(row);
-                            });
-                        }
-                    }
+    $.ajax({
+        url: '@Url.Action("FilterProducts", "Home")',
+        type: 'GET',
+        data: { brandId: brandId, categoryId: categoryId },
+        success: function (data) {
+            tbody.empty();
+
+            if (data.length === 0) {
+                tbody.append('<tr><td colspan="5" class="text-center">No products found</td></tr>');
+            } else {
+                $.each(data, function (i, product) {
+                    var row = '<tr>' +
+                        '<td>' + product.product_name + '</td>' +
+                        '<td>' + product.brand_name + '</td>' +
+                        '<td>' + product.category_name + '</td>' +
+                        '<td>' + product.model_year + '</td>' +
+                        '<td>$' + product.list_price.toFixed(2) + '</td>' +
+                        '</tr>';
+                    tbody.append(row);
                 });
-            });
+            }
+        },
+        error: function(xhr, status, error) {
+            tbody.html('<tr><td colspan="5" class="text-center text-danger">Error loading products. Please try again.</td></tr>');
+            console.error('Error:', error);
+        }
+    });
+});
         });
     </script>
 }
