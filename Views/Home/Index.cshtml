@@ -1,33 +1,334 @@
-﻿@{
-    ViewBag.Title = "Home Page";
+﻿@model u22710362_HW03.Models.HomeViewModel
+
+@{
+    ViewBag.Title = "Home - Bike Store Management";
 }
 
-<main>
-    <section class="row" aria-labelledby="aspnetTitle">
-        <h1 id="title">ASP.NET</h1>
-        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-        <p><a href="https://asp.net" class="btn btn-primary btn-md">Learn more &raquo;</a></p>
-    </section>
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Bike Store Management System</h1>
 
-    <div class="row">
-        <section class="col-md-4" aria-labelledby="gettingStartedTitle">
-            <h2 id="gettingStartedTitle">Getting started</h2>
-            <p>
-                ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-                enables a clean separation of concerns and gives you full control over markup
-                for enjoyable, agile development.
-            </p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="librariesTitle">
-            <h2 id="librariesTitle">Get more libraries</h2>
-            <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-        </section>
-        <section class="col-md-4" aria-labelledby="hostingTitle">
-            <h2 id="hostingTitle">Web Hosting</h2>
-            <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-            <p><a class="btn btn-outline-dark" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-        </section>
+    <!-- Staff Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Staff Members</h3>
+                    <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createStaffModal">
+                        <i class="fas fa-plus"></i> Add New Staff
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Store</th>
+                                    <th>Active</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var staff in Model.Staffs)
+                                {
+                                    <tr>
+                                        <td>@staff.first_name @staff.last_name</td>
+                                        <td>@staff.email</td>
+                                        <td>@staff.phone</td>
+                                        <td>@staff.stores?.store_name</td>
+                                        <td>@(staff.active == 1 ? "Yes" : "No")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</main>
+
+    <!-- Customers Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Customers</h3>
+                    <button type="button" class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createCustomerModal">
+                        <i class="fas fa-plus"></i> Add New Customer
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>City</th>
+                                    <th>State</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var customer in Model.Customers)
+                                {
+                                    <tr>
+                                        <td>@customer.first_name @customer.last_name</td>
+                                        <td>@customer.email</td>
+                                        <td>@customer.phone</td>
+                                        <td>@customer.city</td>
+                                        <td>@customer.state</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h3 class="mb-3">Products (Bicycles)</h3>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label for="brandFilter" class="form-label">Filter by Brand:</label>
+                            <select id="brandFilter" class="form-select">
+                                <option value="">All Brands</option>
+                                @foreach (var brand in ViewBag.Brands)
+                                {
+                                    <option value="@brand.brand_id">@brand.brand_name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="categoryFilter" class="form-label">Filter by Category:</label>
+                            <select id="categoryFilter" class="form-select">
+                                <option value="">All Categories</option>
+                                @foreach (var category in ViewBag.Categories)
+                                {
+                                    <option value="@category.category_id">@category.category_name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="button" id="filterBtn" class="btn btn-light w-100">Filter</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="productsTable">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Brand</th>
+                                    <th>Category</th>
+                                    <th>Model Year</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model.Products)
+                                {
+                                    <tr>
+                                        <td>@product.product_name</td>
+                                        <td>@product.brands?.brand_name</td>
+                                        <td>@product.categories?.category_name</td>
+                                        <td>@product.model_year</td>
+                                        <td>$@product.list_price</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Staff Modal -->
+<div class="modal fade" id="createStaffModal" tabindex="-1" aria-labelledby="createStaffModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createStaffModalLabel">Add New Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createStaffForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="staff_first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="staff_first_name" name="first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="staff_last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="staff_last_name" name="last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="staff_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="staff_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="staff_phone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="staff_phone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="staff_active" class="form-label">Active</label>
+                        <select class="form-select" id="staff_active" name="active" required>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="staff_store_id" class="form-label">Store</label>
+                        <select class="form-select" id="staff_store_id" name="store_id" required>
+                            @foreach (var store in ViewBag.Stores)
+                            {
+                                <option value="@store.store_id">@store.store_name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Staff</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Customer Modal -->
+<div class="modal fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createCustomerModalLabel">Add New Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="createCustomerForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="customer_first_name" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="customer_first_name" name="first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_last_name" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="customer_last_name" name="last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="customer_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_phone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" id="customer_phone" name="phone">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_street" class="form-label">Street</label>
+                        <input type="text" class="form-control" id="customer_street" name="street">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="customer_city" name="city">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="customer_state" name="state">
+                    </div>
+                    <div class="mb-3">
+                        <label for="customer_zip_code" class="form-label">Zip Code</label>
+                        <input type="text" class="form-control" id="customer_zip_code" name="zip_code">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Save Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Create Staff Form Submit
+            $('#createStaffForm').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CreateStaff", "Home")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Staff created successfully!');
+                            location.reload();
+                        } else {
+                            alert('Failed to create staff.');
+                        }
+                    }
+                });
+            });
+
+            // Create Customer Form Submit
+            $('#createCustomerForm').submit(function (e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '@Url.Action("CreateCustomer", "Home")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Customer created successfully!');
+                            location.reload();
+                        } else {
+                            alert('Failed to create customer.');
+                        }
+                    }
+                });
+            });
+
+            // Filter Products
+            $('#filterBtn').click(function () {
+                var brandId = $('#brandFilter').val();
+                var categoryId = $('#categoryFilter').val();
+
+                $.ajax({
+                    url: '@Url.Action("FilterProducts", "Home")',
+                    type: 'GET',
+                    data: { brandId: brandId, categoryId: categoryId },
+                    success: function (data) {
+                        var tbody = $('#productsTable tbody');
+                        tbody.empty();
+
+                        if (data.length === 0) {
+                            tbody.append('<tr><td colspan="5" class="text-center">No products found</td></tr>');
+                        } else {
+                            $.each(data, function (i, product) {
+                                var row = '<tr>' +
+                                    '<td>' + product.product_name + '</td>' +
+                                    '<td>' + product.brand_name + '</td>' +
+                                    '<td>' + product.category_name + '</td>' +
+                                    '<td>' + product.model_year + '</td>' +
+                                    '<td>$' + product.list_price + '</td>' +
+                                    '</tr>';
+                                tbody.append(row);
+                            });
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

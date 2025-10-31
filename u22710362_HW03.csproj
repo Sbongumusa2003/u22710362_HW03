@@ -147,6 +147,7 @@
     <Compile Include="Models\customers.cs">
       <DependentUpon>Model1.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\HomeViewModel.cs" />
     <Compile Include="Models\Model1.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -247,8 +248,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\customers\Create.cshtml" />
     <Content Include="Views\customers\Delete.cshtml" />
@@ -265,11 +264,11 @@
     <Content Include="Views\staffs\Details.cshtml" />
     <Content Include="Views\staffs\Edit.cshtml" />
     <Content Include="Views\staffs\Index.cshtml" />
+    <Content Include="Views\Maintain\Index.cshtml" />
+    <Content Include="Views\Report\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Maintain\" />
-    <Folder Include="Views\Report\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
