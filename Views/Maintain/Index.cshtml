@@ -126,7 +126,19 @@
         align-items: center;
         justify-content: center;
         background-color: white;
+        overflow: hidden;
     }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .product-image .placeholder-text {
+            color: #999;
+            font-style: italic;
+        }
 
     .dropdown-label {
         display: flex;
@@ -288,8 +300,7 @@
                     </div>
                 </div>
                 <div class="product-image" id="productImageContainer">
-                    <img id="productImage" src="" alt="Product Image" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
-                    <span id="productImagePlaceholder">Bicycle image</span>
+                    <span class="placeholder-text">Select a product</span>
                 </div>
             </div>
 
@@ -348,7 +359,9 @@
                     product_id = p.product_id,
                     product_name = p.product_name,
                     brand_id = p.brand_id,
+                    brand_name = p.brands != null ? p.brands.brand_name : "N/A",
                     category_id = p.category_id,
+                    category_name = p.categories != null ? p.categories.category_name : "N/A",
                     model_year = p.model_year,
                     list_price = p.list_price
                 }).ToList()
@@ -508,7 +521,9 @@
                 pageData.forEach(function(product) {
                     var $li = $('<li class="product-item"></li>');
                     $li.attr('data-id', product.product_id);
-                    $li.text(product.product_name + ' - $' + product.list_price);
+                    $li.attr('data-product-name', product.product_name);
+                    $li.attr('data-brand-name', product.brand_name);
+                    $li.text(product.product_name + ' - $' + product.list_price.toFixed(2));
                     $list.append($li);
                 });
 
@@ -566,6 +581,9 @@
             function attachProductClickHandlers() {
                 $('.product-item').click(function () {
                     selectedProductId = $(this).data('id');
+                    var productName = $(this).data('product-name');
+                    var brandName = $(this).data('brand-name');
+
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
@@ -578,22 +596,15 @@
                             $('#maintain_product_category').val(data.category_id);
 
                             // Load product image
-                            loadProductImage(data.product_id, data.brand_id);
+                            loadProductImage(data.product_id, brandName, data.product_name);
                         }
                     });
                 });
             }
 
             // Function to load product image
-            function loadProductImage(productId, brandId) {
-                // Get brand name from dropdown
-                var brandName = $('#maintain_product_brand option[value="' + brandId + '"]').text();
-
-                // Try different image extensions
-                var extensions = ['.jpg', '.jpeg', '.png', '.gif'];
-                var imageFound = false;
-
-                // Construct image path: /Content/Images/{ProductId}.{ext} or /Content/Images/{BrandName}.{ext}
+            function loadProductImage(productId, brandName, productName) {
+                var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
                 // Try product ID based images first
@@ -601,10 +612,32 @@
                     imagePaths.push('/Content/Images/' + productId + ext);
                 });
 
+                // Try product name variations
+                if (productName) {
+                    var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
+                    extensions.forEach(function(ext) {
+                        imagePaths.push('/Content/Images/' + productNameClean + ext);
+                    });
+                    var productNameNoSpaces = productName.replace(/\s+/g, '');
+                    extensions.forEach(function(ext) {
+                        imagePaths.push('/Content/Images/' + productNameNoSpaces + ext);
+                    });
+                }
+
                 // Try brand name based images
+                if (brandName && brandName !== 'N/A') {
+                    extensions.forEach(function(ext) {
+                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                        imagePaths.push('/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
+                    });
+                }
+
+                // Try generic bicycle image
                 extensions.forEach(function(ext) {
-                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
-                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                    imagePaths.push('/Content/Images/bicycle' + ext);
+                    imagePaths.push('/Content/Images/bike' + ext);
+                    imagePaths.push('/Content/Images/default' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
@@ -614,16 +647,14 @@
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
                     // No image found, show placeholder
-                    $('#productImage').hide();
-                    $('#productImagePlaceholder').show();
+                    $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
                     return;
                 }
 
                 var img = new Image();
                 img.onload = function() {
                     // Image found
-                    $('#productImage').attr('src', paths[index]).show();
-                    $('#productImagePlaceholder').hide();
+                    $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" />');
                 };
                 img.onerror = function() {
                     // Try next path

@@ -765,7 +765,7 @@
 
             // Load product image
             function loadProductImage(productId, brandName) {
-                var extensions = ['.jpg', '.jpeg', '.png', '.gif'];
+                var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
                 // Try product ID based images first
@@ -773,10 +773,33 @@
                     imagePaths.push('/Content/Images/' + productId + ext);
                 });
 
+                // Try product name variations
+                var product = filteredProductData.find(p => p.product_id === productId);
+                if (product && product.product_name) {
+                    var productNameClean = product.product_name.replace(/[^a-zA-Z0-9]/g, '_');
+                    extensions.forEach(function(ext) {
+                        imagePaths.push('/Content/Images/' + productNameClean + ext);
+                    });
+                    var productNameNoSpaces = product.product_name.replace(/\s+/g, '');
+                    extensions.forEach(function(ext) {
+                        imagePaths.push('/Content/Images/' + productNameNoSpaces + ext);
+                    });
+                }
+
                 // Try brand name based images
+                if (brandName) {
+                    extensions.forEach(function(ext) {
+                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                        imagePaths.push('/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
+                    });
+                }
+
+                // Try generic bicycle image
                 extensions.forEach(function(ext) {
-                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
-                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                    imagePaths.push('/Content/Images/bicycle' + ext);
+                    imagePaths.push('/Content/Images/bike' + ext);
+                    imagePaths.push('/Content/Images/default' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
@@ -791,7 +814,7 @@
 
                 var img = new Image();
                 img.onload = function() {
-                    $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" />');
+                    $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" style="max-width: 100%; max-height: 100%; object-fit: contain;" />');
                 };
                 img.onerror = function() {
                     tryLoadImage(paths, index + 1);
