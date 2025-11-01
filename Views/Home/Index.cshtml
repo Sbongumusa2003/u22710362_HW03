@@ -61,7 +61,16 @@
         .list-box li {
             padding: 5px 0;
             border-bottom: 1px solid #eee;
+            cursor: pointer;
         }
+
+            .list-box li:hover {
+                background-color: #f0f0f0;
+            }
+
+            .list-box li.selected {
+                background-color: #e3f2fd;
+            }
 
     .pagination {
         display: flex;
@@ -116,6 +125,7 @@
     .product-image {
         border: 1px solid #999;
         height: 200px;
+        width: 200px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -146,10 +156,61 @@
         color: #666;
         margin-top: 5px;
     }
+
+    .product-info-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+        .product-info-row label {
+            flex: 0 0 100px;
+            font-weight: bold;
+        }
+
+        .product-info-row span {
+            flex: 1;
+        }
+
+    .product-list {
+        margin-top: 15px;
+        border: 1px solid #999;
+        padding: 10px;
+        background-color: white;
+        max-height: 150px;
+        overflow-y: auto;
+    }
+
+        .product-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .product-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+            .product-list li:hover {
+                background-color: #f0f0f0;
+            }
+
+            .product-list li.selected {
+                background-color: #e3f2fd;
+            }
 </style>
 
 <div class="container-fluid mt-4">
     <h2>Home</h2>
+
+    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage as string))
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
 
     @Html.AntiForgeryToken()
 
@@ -160,40 +221,31 @@
 
             <div class="form-row">
                 <label>First Name</label>
-                <input type="text" class="form-control form-control-sm" id="staff_first_name">
+                <input type="text" class="form-control form-control-sm" id="staff_first_name" readonly>
             </div>
             <div class="form-row">
                 <label>Last Name</label>
-                <input type="text" class="form-control form-control-sm" id="staff_last_name">
+                <input type="text" class="form-control form-control-sm" id="staff_last_name" readonly>
             </div>
             <div class="form-row">
                 <label>Staff ID</label>
                 <input type="text" class="form-control form-control-sm" id="staff_id" readonly>
             </div>
             <div class="form-row">
-                <label>...</label>
-                <input type="text" class="form-control form-control-sm" id="staff_other" placeholder="Additional fields">
+                <label>Email</label>
+                <input type="text" class="form-control form-control-sm" id="staff_email" readonly>
+            </div>
+            <div class="form-row">
+                <label>Store</label>
+                <input type="text" class="form-control form-control-sm" id="staff_store" readonly>
             </div>
 
             <div class="list-box">
-                <ul id="staffList">
-                    <li>Sold Item One</li>
-                    <li>Sold Item Two</li>
-                    <li>Sold Item Three</li>
-                </ul>
+                <ul id="staffList"></ul>
             </div>
 
             <div class="page-info" id="staffPageInfo">Page 1 of 1</div>
-            <div class="pagination" id="staffPagination">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>...</button>
-                <button>&gt;</button>
-                <button>&lt;</button>
-                <button>&gt;&gt;</button>
-            </div>
+            <div class="pagination" id="staffPagination"></div>
 
             <div class="action-buttons">
                 <button class="btn btn-sm btn-primary" id="createStaffBtn">Create</button>
@@ -206,40 +258,31 @@
 
             <div class="form-row">
                 <label>First Name</label>
-                <input type="text" class="form-control form-control-sm" id="customer_first_name">
+                <input type="text" class="form-control form-control-sm" id="customer_first_name" readonly>
             </div>
             <div class="form-row">
                 <label>Last Name</label>
-                <input type="text" class="form-control form-control-sm" id="customer_last_name">
+                <input type="text" class="form-control form-control-sm" id="customer_last_name" readonly>
             </div>
             <div class="form-row">
                 <label>Customer ID</label>
                 <input type="text" class="form-control form-control-sm" id="customer_id" readonly>
             </div>
             <div class="form-row">
-                <label>...</label>
-                <input type="text" class="form-control form-control-sm" id="customer_other" placeholder="Additional fields">
+                <label>Email</label>
+                <input type="text" class="form-control form-control-sm" id="customer_email" readonly>
+            </div>
+            <div class="form-row">
+                <label>City</label>
+                <input type="text" class="form-control form-control-sm" id="customer_city" readonly>
             </div>
 
             <div class="list-box">
-                <ul id="customerList">
-                    <li>Purchased Item One</li>
-                    <li>Purchased Item Two</li>
-                    <li>Purchased Item Three</li>
-                </ul>
+                <ul id="customerList"></ul>
             </div>
 
             <div class="page-info" id="customerPageInfo">Page 1 of 1</div>
-            <div class="pagination" id="customerPagination">
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>...</button>
-                <button>&gt;</button>
-                <button>&lt;</button>
-                <button>&gt;&gt;</button>
-            </div>
+            <div class="pagination" id="customerPagination"></div>
 
             <div class="action-buttons">
                 <button class="btn btn-sm btn-primary" id="createCustomerBtn">Create</button>
@@ -254,30 +297,61 @@
                 <div class="product-left">
                     <div class="product-details">
                         <div class="filter-section">
+                            <label style="font-weight: bold;">Filter:</label>
                             <select class="form-select form-select-sm" id="productBrandFilter" style="width: 150px;">
                                 <option value="">All Brands</option>
-                                @foreach (var brand in ViewBag.Brands)
+                                @if (ViewBag.Brands != null)
                                 {
-                                    <option value="@brand.brand_id">@brand.brand_name</option>
+                                    foreach (var brand in ViewBag.Brands)
+                                    {
+                                        <option value="@brand.brand_id">@brand.brand_name</option>
+                                    }
                                 }
                             </select>
                             <select class="form-select form-select-sm" id="productCategoryFilter" style="width: 150px;">
                                 <option value="">All Categories</option>
-                                @foreach (var category in ViewBag.Categories)
+                                @if (ViewBag.Categories != null)
                                 {
-                                    <option value="@category.category_id">@category.category_name</option>
+                                    foreach (var category in ViewBag.Categories)
+                                    {
+                                        <option value="@category.category_id">@category.category_name</option>
+                                    }
                                 }
                             </select>
                         </div>
 
-                        <input type="text" class="form-control form-control-sm mb-2" id="product_detail_1" placeholder="Product details">
-                        <input type="text" class="form-control form-control-sm mb-2" id="product_detail_2" placeholder="More details">
-                        <input type="text" class="form-control form-control-sm" id="product_detail_3" placeholder="Additional info">
+                        <div class="product-info-row">
+                            <label>Product Name:</label>
+                            <span id="product_name">-</span>
+                        </div>
+                        <div class="product-info-row">
+                            <label>Brand:</label>
+                            <span id="product_brand">-</span>
+                        </div>
+                        <div class="product-info-row">
+                            <label>Category:</label>
+                            <span id="product_category">-</span>
+                        </div>
+                        <div class="product-info-row">
+                            <label>Model Year:</label>
+                            <span id="product_year">-</span>
+                        </div>
+                        <div class="product-info-row">
+                            <label>Price:</label>
+                            <span id="product_price">-</span>
+                        </div>
                     </div>
+
+                    <div class="product-list">
+                        <ul id="productList"></ul>
+                    </div>
+
+                    <div class="page-info" id="productPageInfo">Page 1 of 1</div>
+                    <div class="pagination" id="productPagination"></div>
                 </div>
 
                 <div class="product-image" id="productImageContainer">
-                    <span class="placeholder-text">Bicycle image</span>
+                    <span class="placeholder-text">Select a product</span>
                 </div>
             </div>
         </div>
@@ -294,34 +368,50 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="modal_staff_first_name">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" class="form-control" id="modal_staff_first_name" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="modal_staff_last_name">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" id="modal_staff_last_name" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="modal_staff_email">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" id="modal_staff_email" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
                     <input type="text" class="form-control" id="modal_staff_phone">
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Active</label>
+                    <label class="form-label">Active *</label>
                     <select class="form-select" id="modal_staff_active">
                         <option value="1">Yes</option>
                         <option value="0">No</option>
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Store</label>
-                    <select class="form-select" id="modal_staff_store">
-                        @foreach (var store in ViewBag.Stores)
+                    <label class="form-label">Store *</label>
+                    <select class="form-select" id="modal_staff_store" required>
+                        @if (ViewBag.Stores != null)
                         {
-                            <option value="@store.store_id">@store.store_name</option>
+                            foreach (var store in ViewBag.Stores)
+                            {
+                                <option value="@store.store_id">@store.store_name</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Manager</label>
+                    <select class="form-select" id="modal_staff_manager">
+                        <option value="">No Manager</option>
+                        @if (Model != null && Model.Staffs != null)
+                        {
+                            foreach (var staff in Model.Staffs)
+                            {
+                                <option value="@staff.staff_id">@staff.first_name @staff.last_name</option>
+                            }
                         }
                     </select>
                 </div>
@@ -344,16 +434,16 @@
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" id="modal_customer_first_name">
+                    <label class="form-label">First Name *</label>
+                    <input type="text" class="form-control" id="modal_customer_first_name" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" id="modal_customer_last_name">
+                    <label class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" id="modal_customer_last_name" required>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" class="form-control" id="modal_customer_email">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-control" id="modal_customer_email" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Phone</label>
@@ -373,7 +463,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="modal_customer_zip">
+                    <input type="text" class="form-control" id="modal_customer_zip" maxlength="5">
                 </div>
             </div>
             <div class="modal-footer">
@@ -387,6 +477,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
+            // Initialize data arrays from server
             var staffData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
                 Model.Staffs.Select(s => new {
                     staff_id = s.staff_id,
@@ -395,7 +486,8 @@
                     email = s.email,
                     phone = s.phone,
                     active = s.active,
-                    store_id = s.store_id
+                    store_id = s.store_id,
+                    store_name = s.stores != null ? s.stores.store_name : "N/A"
                 }).ToList()
             ));
 
@@ -418,15 +510,106 @@
                     product_id = p.product_id,
                     product_name = p.product_name,
                     brand_id = p.brand_id,
+                    brand_name = p.brands != null ? p.brands.brand_name : "N/A",
                     category_id = p.category_id,
+                    category_name = p.categories != null ? p.categories.category_name : "N/A",
                     model_year = p.model_year,
                     list_price = p.list_price
                 }).ToList()
             ));
 
+            var filteredProductData = productData;
             var itemsPerPage = 10;
             var staffCurrentPage = 1;
             var customerCurrentPage = 1;
+            var productCurrentPage = 1;
+            var selectedStaffId = null;
+            var selectedCustomerId = null;
+            var selectedProductId = null;
+
+            // Pagination function
+            function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
+                var totalPages = Math.ceil(totalItems / itemsPerPage);
+                var $pagination = $('#' + paginationElementId);
+                $pagination.empty();
+
+                if (totalPages <= 1) return;
+
+                // First button
+                var $first = $('<button>&lt;&lt;</button>');
+                $first.prop('disabled', currentPage === 1);
+                $first.click(function() {
+                    if (currentPage !== 1) {
+                        onPageChange(1);
+                    }
+                });
+                $pagination.append($first);
+
+                // Previous button
+                var $prev = $('<button>&lt;</button>');
+                $prev.prop('disabled', currentPage === 1);
+                $prev.click(function() {
+                    if (currentPage > 1) {
+                        onPageChange(currentPage - 1);
+                    }
+                });
+                $pagination.append($prev);
+
+                // Page numbers
+                var startPage = Math.max(1, currentPage - 2);
+                var endPage = Math.min(totalPages, currentPage + 2);
+
+                if (startPage > 1) {
+                    var $page1 = $('<button>1</button>');
+                    $page1.click(function() { onPageChange(1); });
+                    $pagination.append($page1);
+
+                    if (startPage > 2) {
+                        $pagination.append($('<button disabled>...</button>'));
+                    }
+                }
+
+                for (var i = startPage; i <= endPage; i++) {
+                    var $pageBtn = $('<button>' + i + '</button>');
+                    if (i === currentPage) {
+                        $pageBtn.addClass('active');
+                    }
+                    $pageBtn.data('page', i);
+                    $pageBtn.click(function() {
+                        onPageChange($(this).data('page'));
+                    });
+                    $pagination.append($pageBtn);
+                }
+
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        $pagination.append($('<button disabled>...</button>'));
+                    }
+                    var $pageLast = $('<button>' + totalPages + '</button>');
+                    $pageLast.click(function() { onPageChange(totalPages); });
+                    $pagination.append($pageLast);
+                }
+
+                // Next button
+                var $next = $('<button>&gt;</button>');
+                $next.prop('disabled', currentPage === totalPages);
+                $next.click(function() {
+                    if (currentPage < totalPages) {
+                        onPageChange(currentPage + 1);
+                    }
+                });
+                $pagination.append($next);
+
+                // Last button
+                var $last = $('<button>&gt;&gt;</button>');
+                $last.prop('disabled', currentPage === totalPages);
+                $last.click(function() {
+                    if (currentPage !== totalPages) {
+                        onPageChange(totalPages);
+                    }
+                });
+                $pagination.append($last);
+            }
 
             // Display staff list
             function displayStaffList(page) {
@@ -438,14 +621,26 @@
                 var $list = $('#staffList');
                 $list.empty();
 
-                pageData.forEach(function(staff) {
-                    var $li = $('<li></li>');
-                    $li.text('Sold by: ' + staff.first_name + ' ' + staff.last_name);
-                    $list.append($li);
-                });
+                if (pageData.length === 0) {
+                    $list.append('<li style="text-align: center; color: #999;">No staff found</li>');
+                } else {
+                    pageData.forEach(function(staff) {
+                        var $li = $('<li class="staff-item"></li>');
+                        $li.attr('data-id', staff.staff_id);
+                        $li.text(staff.first_name + ' ' + staff.last_name + ' - ' + staff.store_name);
+                        if (staff.staff_id === selectedStaffId) {
+                            $li.addClass('selected');
+                        }
+                        $list.append($li);
+                    });
+                }
+
+                createPagination(staffData.length, page, 'staffPagination', displayStaffList);
 
                 var totalPages = Math.ceil(staffData.length / itemsPerPage);
                 $('#staffPageInfo').text('Page ' + page + ' of ' + totalPages);
+
+                attachStaffClickHandlers();
             }
 
             // Display customer list
@@ -458,14 +653,150 @@
                 var $list = $('#customerList');
                 $list.empty();
 
-                pageData.forEach(function(customer) {
-                    var $li = $('<li></li>');
-                    $li.text('Purchased by: ' + customer.first_name + ' ' + customer.last_name);
-                    $list.append($li);
-                });
+                if (pageData.length === 0) {
+                    $list.append('<li style="text-align: center; color: #999;">No customers found</li>');
+                } else {
+                    pageData.forEach(function(customer) {
+                        var $li = $('<li class="customer-item"></li>');
+                        $li.attr('data-id', customer.customer_id);
+                        $li.text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
+                        if (customer.customer_id === selectedCustomerId) {
+                            $li.addClass('selected');
+                        }
+                        $list.append($li);
+                    });
+                }
+
+                createPagination(customerData.length, page, 'customerPagination', displayCustomerList);
 
                 var totalPages = Math.ceil(customerData.length / itemsPerPage);
                 $('#customerPageInfo').text('Page ' + page + ' of ' + totalPages);
+
+                attachCustomerClickHandlers();
+            }
+
+            // Display product list
+            function displayProductList(page) {
+                productCurrentPage = page;
+                var start = (page - 1) * itemsPerPage;
+                var end = start + itemsPerPage;
+                var pageData = filteredProductData.slice(start, end);
+
+                var $list = $('#productList');
+                $list.empty();
+
+                if (pageData.length === 0) {
+                    $list.append('<li style="text-align: center; color: #999;">No products found</li>');
+                } else {
+                    pageData.forEach(function(product) {
+                        var $li = $('<li class="product-item"></li>');
+                        $li.attr('data-id', product.product_id);
+                        $li.text(product.product_name + ' - $' + product.list_price.toFixed(2));
+                        if (product.product_id === selectedProductId) {
+                            $li.addClass('selected');
+                        }
+                        $list.append($li);
+                    });
+                }
+
+                createPagination(filteredProductData.length, page, 'productPagination', displayProductList);
+
+                var totalPages = Math.ceil(filteredProductData.length / itemsPerPage);
+                $('#productPageInfo').text('Page ' + page + ' of ' + totalPages);
+
+                attachProductClickHandlers();
+            }
+
+            // Attach staff click handlers
+            function attachStaffClickHandlers() {
+                $('.staff-item').click(function () {
+                    selectedStaffId = $(this).data('id');
+                    $('.staff-item').removeClass('selected');
+                    $(this).addClass('selected');
+
+                    var staff = staffData.find(s => s.staff_id === selectedStaffId);
+                    if (staff) {
+                        $('#staff_first_name').val(staff.first_name);
+                        $('#staff_last_name').val(staff.last_name);
+                        $('#staff_id').val(staff.staff_id);
+                        $('#staff_email').val(staff.email || '');
+                        $('#staff_store').val(staff.store_name);
+                    }
+                });
+            }
+
+            // Attach customer click handlers
+            function attachCustomerClickHandlers() {
+                $('.customer-item').click(function () {
+                    selectedCustomerId = $(this).data('id');
+                    $('.customer-item').removeClass('selected');
+                    $(this).addClass('selected');
+
+                    var customer = customerData.find(c => c.customer_id === selectedCustomerId);
+                    if (customer) {
+                        $('#customer_first_name').val(customer.first_name);
+                        $('#customer_last_name').val(customer.last_name);
+                        $('#customer_id').val(customer.customer_id);
+                        $('#customer_email').val(customer.email || '');
+                        $('#customer_city').val(customer.city || '');
+                    }
+                });
+            }
+
+            // Attach product click handlers
+            function attachProductClickHandlers() {
+                $('.product-item').click(function () {
+                    selectedProductId = $(this).data('id');
+                    $('.product-item').removeClass('selected');
+                    $(this).addClass('selected');
+
+                    var product = filteredProductData.find(p => p.product_id === selectedProductId);
+                    if (product) {
+                        $('#product_name').text(product.product_name);
+                        $('#product_brand').text(product.brand_name);
+                        $('#product_category').text(product.category_name);
+                        $('#product_year').text(product.model_year);
+                        $('#product_price').text('$' + product.list_price.toFixed(2));
+
+                        loadProductImage(product.product_id, product.brand_name);
+                    }
+                });
+            }
+
+            // Load product image
+            function loadProductImage(productId, brandName) {
+                var extensions = ['.jpg', '.jpeg', '.png', '.gif'];
+                var imagePaths = [];
+
+                // Try product ID based images first
+                extensions.forEach(function(ext) {
+                    imagePaths.push('/Content/Images/' + productId + ext);
+                });
+
+                // Try brand name based images
+                extensions.forEach(function(ext) {
+                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                });
+
+                tryLoadImage(imagePaths, 0);
+            }
+
+            // Recursively try to load images
+            function tryLoadImage(paths, index) {
+                if (index >= paths.length) {
+                    $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
+                    return;
+                }
+
+                var img = new Image();
+                img.onload = function() {
+                    $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" />');
+                };
+                img.onerror = function() {
+                    tryLoadImage(paths, index + 1);
+                };
+                img.src = paths[index];
             }
 
             // Filter products
@@ -473,35 +804,54 @@
                 var brandId = $('#productBrandFilter').val();
                 var categoryId = $('#productCategoryFilter').val();
 
-                $.ajax({
-                    url: '@Url.Action("FilterProducts", "Home")',
-                    type: 'GET',
-                    data: { brandId: brandId, categoryId: categoryId },
-                    success: function(data) {
-                        console.log('Filtered products:', data);
-                        // Update product display here
-                    }
+                filteredProductData = productData.filter(function(product) {
+                    var matchBrand = !brandId || product.brand_id == brandId;
+                    var matchCategory = !categoryId || product.category_id == categoryId;
+                    return matchBrand && matchCategory;
                 });
+
+                productCurrentPage = 1;
+                displayProductList(1);
             }
 
-            // Initialize
+            // Initialize lists
             displayStaffList(1);
             displayCustomerList(1);
+            displayProductList(1);
 
             // Create Staff
             $('#createStaffBtn').click(function() {
+                // Clear form
+                $('#modal_staff_first_name').val('');
+                $('#modal_staff_last_name').val('');
+                $('#modal_staff_email').val('');
+                $('#modal_staff_phone').val('');
+                $('#modal_staff_active').val('1');
+                $('#modal_staff_store').val($('#modal_staff_store option:first').val());
+                $('#modal_staff_manager').val('');
+
                 var staffModal = new bootstrap.Modal(document.getElementById('staffModal'));
                 staffModal.show();
             });
 
             $('#saveStaffBtn').click(function() {
+                var firstName = $('#modal_staff_first_name').val().trim();
+                var lastName = $('#modal_staff_last_name').val().trim();
+                var email = $('#modal_staff_email').val().trim();
+
+                if (!firstName || !lastName || !email) {
+                    alert('Please fill in all required fields (First Name, Last Name, Email)');
+                    return;
+                }
+
                 var data = {
-                    first_name: $('#modal_staff_first_name').val(),
-                    last_name: $('#modal_staff_last_name').val(),
-                    email: $('#modal_staff_email').val(),
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
                     phone: $('#modal_staff_phone').val(),
                     active: $('#modal_staff_active').val(),
                     store_id: $('#modal_staff_store').val(),
+                    manager_id: $('#modal_staff_manager').val() || null,
                     __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                 };
 
@@ -516,21 +866,43 @@
                         } else {
                             alert(response.message);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
                     }
                 });
             });
 
             // Create Customer
             $('#createCustomerBtn').click(function() {
+                // Clear form
+                $('#modal_customer_first_name').val('');
+                $('#modal_customer_last_name').val('');
+                $('#modal_customer_email').val('');
+                $('#modal_customer_phone').val('');
+                $('#modal_customer_street').val('');
+                $('#modal_customer_city').val('');
+                $('#modal_customer_state').val('');
+                $('#modal_customer_zip').val('');
+
                 var customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
                 customerModal.show();
             });
 
             $('#saveCustomerBtn').click(function() {
+                var firstName = $('#modal_customer_first_name').val().trim();
+                var lastName = $('#modal_customer_last_name').val().trim();
+                var email = $('#modal_customer_email').val().trim();
+
+                if (!firstName || !lastName || !email) {
+                    alert('Please fill in all required fields (First Name, Last Name, Email)');
+                    return;
+                }
+
                 var data = {
-                    first_name: $('#modal_customer_first_name').val(),
-                    last_name: $('#modal_customer_last_name').val(),
-                    email: $('#modal_customer_email').val(),
+                    first_name: firstName,
+                    last_name: lastName,
+                    email: email,
                     phone: $('#modal_customer_phone').val(),
                     street: $('#modal_customer_street').val(),
                     city: $('#modal_customer_city').val(),
@@ -550,6 +922,9 @@
                         } else {
                             alert(response.message);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
                     }
                 });
             });
