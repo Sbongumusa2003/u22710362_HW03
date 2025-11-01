@@ -60,6 +60,7 @@ namespace u22710362_HW03.Controllers
             }
 
             var files = Directory.GetFiles(filesPath)
+                .Where(f => !f.EndsWith(".description.txt")) // Exclude description files
                 .Select(f => new FileInfo(f))
                 .Select(fi => new SavedFileInfo
                 {
@@ -76,55 +77,6 @@ namespace u22710362_HW03.Controllers
             return View();
         }
 
-        // GET: Report/GetSalesReport
-        public async Task<ActionResult> GetSalesReport()
-        {
-            var salesData = await db.order_items
-                .Include(oi => oi.products.brands) // Eager loading
-                .GroupBy(oi => oi.products.brands.brand_name)
-                .Select(g => new
-                {
-                    Brand = g.Key,
-                    TotalSales = g.Sum(oi => oi.quantity * oi.list_price * (1 - oi.discount))
-                })
-                .OrderByDescending(x => x.TotalSales)
-                .ToListAsync();
-
-            return Json(salesData, JsonRequestBehavior.AllowGet);
-        }
-
-        // GET: Report/GetCustomerReport
-        public async Task<ActionResult> GetCustomerReport()
-        {
-            var customerData = await db.orders
-                .Where(o => o.customer_id.HasValue)
-                .GroupBy(o => o.customer_id)
-                .Select(g => new
-                {
-                    CustomerId = g.Key,
-                    OrderCount = g.Count()
-                })
-                .OrderByDescending(x => x.OrderCount)
-                .Take(10)
-                .ToListAsync();
-
-            var result = new List<object>();
-            foreach (var item in customerData)
-            {
-                var customer = await db.customers.FindAsync(item.CustomerId);
-                if (customer != null)
-                {
-                    result.Add(new
-                    {
-                        CustomerName = customer.first_name + " " + customer.last_name,
-                        OrderCount = item.OrderCount
-                    });
-                }
-            }
-
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
         // POST: Report/SaveReport
         [HttpPost]
         public ActionResult SaveReport(string fileName, string fileType, string reportHtml, string description)
@@ -135,6 +87,19 @@ namespace u22710362_HW03.Controllers
                 if (!Directory.Exists(filesPath))
                 {
                     Directory.CreateDirectory(filesPath);
+                }
+
+                // Clean filename
+                fileName = fileName.Trim();
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    fileName = "Report";
+                }
+
+                // Remove invalid characters
+                foreach (char c in Path.GetInvalidFileNameChars())
+                {
+                    fileName = fileName.Replace(c, '_');
                 }
 
                 var fullFileName = $"{fileName}_{DateTime.Now:yyyyMMddHHmmss}.{fileType}";
@@ -148,11 +113,13 @@ namespace u22710362_HW03.Controllers
                 {
                     // Strip HTML tags for text file
                     var plainText = System.Text.RegularExpressions.Regex.Replace(reportHtml, "<.*?>", string.Empty);
+                    // Decode HTML entities
+                    plainText = System.Net.WebUtility.HtmlDecode(plainText);
                     System.IO.File.WriteAllText(filePath, plainText);
                 }
 
                 // Save description if provided (bonus feature)
-                if (!string.IsNullOrEmpty(description))
+                if (!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
                 {
                     var descriptionPath = Path.Combine(filesPath, fullFileName + ".description.txt");
                     System.IO.File.WriteAllText(descriptionPath, description);
@@ -250,22 +217,5 @@ namespace u22710362_HW03.Controllers
             }
             base.Dispose(disposing);
         }
-    }
-
-    // Helper classes
-    public class ReportDataItem
-    {
-        public string Label { get; set; }
-        public int Value { get; set; }
-        public string Brand { get; set; }
-        public string Category { get; set; }
-    }
-
-    public class SavedFileInfo
-    {
-        public string FileName { get; set; }
-        public long FileSize { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public string FilePath { get; set; }
     }
 }

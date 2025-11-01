@@ -3,12 +3,14 @@
 }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.70/vfs_fonts.js"></script>
+<!-- Summernote WYSIWYG Editor -->
+<link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.js"></script>
 
 <style>
     .report-container {
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 0 auto;
         padding: 20px;
     }
@@ -20,106 +22,200 @@
         background-color: #f9f9f9;
     }
 
-    .report-header {
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    .report-content {
+        background-color: white;
         padding: 30px;
-        background-color: #e0e0e0;
-        border: 2px solid #999;
+        border: 1px solid #ddd;
         margin-bottom: 20px;
     }
 
-    .report-icon {
-        width: 120px;
-        height: 120px;
-        border: 2px solid #666;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+    .chart-container {
+        margin: 30px 0;
+        padding: 20px;
         background-color: white;
+        border: 1px solid #ddd;
     }
+
+    .data-table {
+        margin-top: 20px;
+    }
+
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .data-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
 
     .save-options {
         display: flex;
         gap: 15px;
         align-items: center;
         margin-top: 15px;
+        padding: 15px;
+        background-color: #e9ecef;
+        border-radius: 4px;
     }
 
         .save-options input,
         .save-options select {
             padding: 8px;
             border: 1px solid #999;
+            border-radius: 4px;
         }
 
     .archive-section {
         margin-top: 30px;
+        border: 2px solid #ccc;
+        padding: 20px;
+        background-color: #f9f9f9;
     }
 
     .archive-list {
         border: 2px solid #ccc;
         padding: 15px;
-        background-color: #f5f5f5;
+        background-color: white;
         min-height: 200px;
+        max-height: 500px;
+        overflow-y: auto;
     }
 
     .archive-item {
-        padding: 10px;
-        background-color: white;
+        padding: 15px;
+        background-color: #f8f9fa;
         margin-bottom: 10px;
         border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .archive-item-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .archive-item-info {
+        flex: 1;
+    }
+
+    .archive-item-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .archive-item-description {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: white;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .description-editor {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
     }
 </style>
 
 <div class="report-container">
-    <h2>Report</h2>
+    <h2>Sales Report</h2>
 
     <!-- Report Display Section -->
     <div class="report-section">
-        <div class="report-header">
-            <div class="report-icon">
-                <div style="text-align: center;">
-                    <div style="font-size: 10px; margin-bottom: 5px;">📊</div>
-                    <div style="font-size: 8px;">━━━</div>
-                    <div style="font-size: 8px;">━━━</div>
-                    <div style="font-size: 10px; margin-top: 5px;">⊙</div>
-                </div>
+        <h3>Popular Products Report</h3>
+
+        <div class="report-content" id="reportContent">
+            <h4>Top 10 Most Popular Bicycle Products</h4>
+            <p>Report Generated: <span id="reportDate"></span></p>
+
+            <!-- Chart Container -->
+            <div class="chart-container">
+                <canvas id="reportChart" width="800" height="400"></canvas>
+            </div>
+
+            <!-- Data Table -->
+            <div class="data-table">
+                <table id="reportTable">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Product Name</th>
+                            <th>Brand</th>
+                            <th>Category</th>
+                            <th>Total Orders</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportTableBody">
+                    </tbody>
+                </table>
             </div>
         </div>
 
+        <!-- Save Options -->
         <div class="save-options">
-            <input type="text" id="reportFileName" placeholder="Filename" style="flex: 1;">
-            <input type="text" id="reportFileType" placeholder="File Type" style="flex: 1;">
-            <button type="button" id="saveReportBtn" class="btn btn-secondary">Save</button>
+            <label>Filename:</label>
+            <input type="text" id="reportFileName" placeholder="Enter filename" style="flex: 1;" value="BikeStoreReport">
+
+            <label>File Type:</label>
+            <select id="reportFileType" style="width: 150px;">
+                <option value="html">HTML</option>
+                <option value="txt">Text</option>
+            </select>
+
+            <button type="button" id="saveReportBtn" class="btn btn-primary">Save Report</button>
         </div>
 
-        <!-- Chart Container -->
-        <div style="margin-top: 30px; padding: 20px; background-color: white; border: 1px solid #ddd;">
-            <canvas id="reportChart" width="800" height="400"></canvas>
+        <!-- Description Editor (Bonus Feature) -->
+        <div class="description-editor">
+            <h5>Add Description (Optional)</h5>
+            <div id="descriptionEditor"></div>
         </div>
     </div>
 
-    <!-- Archive Section -->
+    <!-- Document Archive Section -->
     <div class="archive-section">
-        <h3>Archive</h3>
+        <h3>Document Archive</h3>
         <div class="archive-list" id="archiveList">
             @if (ViewBag.SavedFiles != null && ViewBag.SavedFiles.Count > 0)
             {
                 foreach (var file in ViewBag.SavedFiles)
                 {
-                    <div class="archive-item">
-                        <div>
-                            <strong>@file.FileName</strong>
-                            <span style="margin-left: 20px; color: #666;">@((file.FileSize / 1024.0).ToString("F2")) KB</span>
-                            <span style="margin-left: 20px; color: #666;">@file.CreatedDate.ToString("yyyy-MM-dd HH:mm")</span>
+                    <div class="archive-item" data-filename="@file.FileName">
+                        <div class="archive-item-header">
+                            <div class="archive-item-info">
+                                <strong>@file.FileName</strong><br />
+                                <small style="color: #666;">
+                                    Size: @((file.FileSize / 1024.0).ToString("F2")) KB |
+                                    Created: @file.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss")
+                                </small>
+                            </div>
+                            <div class="archive-item-actions">
+                                <button class="btn btn-sm btn-info view-description" data-filename="@file.FileName">View Description</button>
+                                <button class="btn btn-sm btn-primary download-file" data-filename="@file.FileName">Download</button>
+                                <button class="btn btn-sm btn-danger delete-file" data-filename="@file.FileName">Delete</button>
+                            </div>
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-primary download-file" data-filename="@file.FileName">Download</button>
-                            <button class="btn btn-sm btn-danger delete-file" data-filename="@file.FileName">Delete</button>
+                        <div class="archive-item-description" style="display: none;">
+                            Loading description...
                         </div>
                     </div>
                 }
@@ -127,10 +223,7 @@
             else
             {
                 <div style="text-align: center; padding: 40px; color: #999;">
-                    <div style="font-size: 12px; margin-bottom: 10px;">━━━━━━━━━━━</div>
-                    <div style="font-size: 12px; margin-bottom: 10px;">━━━━━━━</div>
-                    <div style="font-size: 12px;">━━━━━━━</div>
-                    <p style="margin-top: 20px;">No saved reports</p>
+                    <p>No saved reports in archive</p>
                 </div>
             }
         </div>
@@ -143,8 +236,46 @@
         var reportChart;
 
         $(document).ready(function () {
+            // Initialize Summernote editor (for bonus feature)
+            $('#descriptionEditor').summernote({
+                height: 200,
+                placeholder: 'Enter a description for this report (optional)...',
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline']],
+                    ['font', ['strikethrough']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview']]
+                ]
+            });
+
+            // Set report date
+            $('#reportDate').text(new Date().toLocaleString());
+
+            // Populate report table
+            var tableBody = $('#reportTableBody');
+            tableBody.empty();
+
+            reportData.forEach(function(item, index) {
+                var row = '<tr>' +
+                    '<td>' + (index + 1) + '</td>' +
+                    '<td>' + item.Label + '</td>' +
+                    '<td>' + (item.Brand || 'N/A') + '</td>' +
+                    '<td>' + (item.Category || 'N/A') + '</td>' +
+                    '<td>' + item.Value + '</td>' +
+                    '</tr>';
+                tableBody.append(row);
+            });
+
             // Create Report Chart
             var ctx = document.getElementById('reportChart').getContext('2d');
+
+            // Generate colors for each bar
+            var colors = reportData.map(function(item, index) {
+                var hue = (index * 360 / reportData.length);
+                return 'hsl(' + hue + ', 70%, 60%)';
+            });
+
             reportChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -152,9 +283,9 @@
                     datasets: [{
                         label: 'Number of Orders',
                         data: reportData.map(item => item.Value),
-                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
+                        backgroundColor: colors,
+                        borderColor: colors.map(c => c.replace('60%', '40%')),
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -165,6 +296,16 @@
                             ticks: {
                                 beginAtZero: true,
                                 stepSize: 1
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Number of Orders'
+                            }
+                        }],
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Product Name'
                             }
                         }]
                     },
@@ -174,24 +315,44 @@
                     },
                     title: {
                         display: true,
-                        text: 'Top 10 Most Popular Products'
+                        text: 'Top 10 Most Popular Products by Order Count',
+                        fontSize: 16
                     }
                 }
             });
 
             // Save Report
             $('#saveReportBtn').click(function () {
-                var fileName = $('#reportFileName').val() || 'Report';
+                var fileName = $('#reportFileName').val().trim() || 'BikeStoreReport';
                 var fileType = $('#reportFileType').val() || 'html';
+                var description = $('#descriptionEditor').summernote('code');
 
-                var reportHtml = '<html><head><title>' + fileName + '</title></head><body>';
+                // Generate report HTML
+                var reportHtml = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + fileName + '</title>';
+                reportHtml += '<style>';
+                reportHtml += 'body { font-family: Arial, sans-serif; margin: 20px; }';
+                reportHtml += 'h1 { color: #333; border-bottom: 3px solid #007bff; padding-bottom: 10px; }';
+                reportHtml += 'h2 { color: #555; margin-top: 30px; }';
+                reportHtml += 'table { width: 100%; border-collapse: collapse; margin: 20px 0; }';
+                reportHtml += 'th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }';
+                reportHtml += 'th { background-color: #007bff; color: white; }';
+                reportHtml += 'tr:nth-child(even) { background-color: #f2f2f2; }';
+                reportHtml += '.report-meta { color: #666; font-style: italic; margin: 10px 0; }';
+                reportHtml += '</style></head><body>';
+
                 reportHtml += '<h1>Bike Store Sales Report</h1>';
-                reportHtml += '<h2>Popular Products</h2>';
-                reportHtml += '<table border="1" cellpadding="5">';
-                reportHtml += '<tr><th>Product Name</th><th>Brand</th><th>Category</th><th>Orders</th></tr>';
+                reportHtml += '<p class="report-meta">Report Generated: ' + new Date().toLocaleString() + '</p>';
 
-                reportData.forEach(function(item) {
+                reportHtml += '<h2>Popular Products Analysis</h2>';
+                reportHtml += '<p>This report shows the top 10 most popular bicycle products based on order count.</p>';
+
+                reportHtml += '<table>';
+                reportHtml += '<thead><tr><th>Rank</th><th>Product Name</th><th>Brand</th><th>Category</th><th>Total Orders</th></tr></thead>';
+                reportHtml += '<tbody>';
+
+                reportData.forEach(function(item, index) {
                     reportHtml += '<tr>';
+                    reportHtml += '<td>' + (index + 1) + '</td>';
                     reportHtml += '<td>' + item.Label + '</td>';
                     reportHtml += '<td>' + (item.Brand || 'N/A') + '</td>';
                     reportHtml += '<td>' + (item.Category || 'N/A') + '</td>';
@@ -199,8 +360,15 @@
                     reportHtml += '</tr>';
                 });
 
-                reportHtml += '</table>';
-                reportHtml += '<p>Report generated on: ' + new Date().toLocaleString() + '</p>';
+                reportHtml += '</tbody></table>';
+
+                // Add summary statistics
+                var totalOrders = reportData.reduce(function(sum, item) { return sum + item.Value; }, 0);
+                reportHtml += '<h2>Summary Statistics</h2>';
+                reportHtml += '<p>Total Orders for Top 10 Products: <strong>' + totalOrders + '</strong></p>';
+                reportHtml += '<p>Average Orders per Product: <strong>' + (totalOrders / reportData.length).toFixed(2) + '</strong></p>';
+
+                reportHtml += '<hr><p style="text-align: center; color: #999; font-size: 12px;">Generated by Bike Store Management System</p>';
                 reportHtml += '</body></html>';
 
                 $.ajax({
@@ -209,23 +377,51 @@
                     data: {
                         fileName: fileName,
                         fileType: fileType,
-                        reportHtml: reportHtml
+                        reportHtml: reportHtml,
+                        description: description
                     },
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
                             location.reload();
                         } else {
-                            alert(response.message);
+                            alert('Error: ' + response.message);
                         }
+                    },
+                    error: function() {
+                        alert('An error occurred while saving the report.');
                     }
                 });
+            });
+
+            // View Description
+            $('.view-description').click(function () {
+                var fileName = $(this).data('filename');
+                var $item = $(this).closest('.archive-item');
+                var $descDiv = $item.find('.archive-item-description');
+
+                if ($descDiv.is(':visible')) {
+                    $descDiv.slideUp();
+                    $(this).text('View Description');
+                } else {
+                    $.get('@Url.Action("GetFileDescription", "Report")', { fileName: fileName }, function(data) {
+                        if (data.success) {
+                            if (data.description) {
+                                $descDiv.html(data.description);
+                            } else {
+                                $descDiv.html('<em>No description available</em>');
+                            }
+                            $descDiv.slideDown();
+                            $item.find('.view-description').text('Hide Description');
+                        }
+                    });
+                }
             });
 
             // Download File
             $('.download-file').click(function () {
                 var fileName = $(this).data('filename');
-                window.location.href = '@Url.Action("DownloadFile", "Report")' + '?fileName=' + fileName;
+                window.location.href = '@Url.Action("DownloadFile", "Report")' + '?fileName=' + encodeURIComponent(fileName);
             });
 
             // Delete File
@@ -241,8 +437,11 @@
                                 alert(response.message);
                                 location.reload();
                             } else {
-                                alert(response.message);
+                                alert('Error: ' + response.message);
                             }
+                        },
+                        error: function() {
+                            alert('An error occurred while deleting the file.');
                         }
                     });
                 }
