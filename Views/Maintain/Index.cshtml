@@ -543,15 +543,23 @@
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    $.get('@Url.Action("GetStaff", "Maintain")/' + selectedStaffId, function (data) {
-                        if (data.success) {
-                            $('#maintain_staff_first_name').val(data.first_name);
-                            $('#maintain_staff_last_name').val(data.last_name);
-                            $('#maintain_staff_id').val(data.staff_id);
-                            $('#maintain_staff_email').val(data.email);
-                            $('#maintain_staff_phone').val(data.phone || '');
-                            $('#maintain_staff_active').val(data.active);
-                            $('#maintain_staff_store').val(data.store_id);
+                    $.ajax({
+                        url: '@Url.Action("GetStaff", "Maintain")/' + selectedStaffId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.success) {
+                                $('#maintain_staff_first_name').val(data.first_name);
+                                $('#maintain_staff_last_name').val(data.last_name);
+                                $('#maintain_staff_id').val(data.staff_id);
+                                $('#maintain_staff_email').val(data.email);
+                                $('#maintain_staff_phone').val(data.phone || '');
+                                $('#maintain_staff_active').val(data.active);
+                                $('#maintain_staff_store').val(data.store_id);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error loading staff:', error);
                         }
                     });
                 });
@@ -564,14 +572,22 @@
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    $.get('@Url.Action("GetCustomer", "Maintain")/' + selectedCustomerId, function (data) {
-                        if (data.success) {
-                            $('#maintain_customer_first_name').val(data.first_name);
-                            $('#maintain_customer_last_name').val(data.last_name);
-                            $('#maintain_customer_id').val(data.customer_id);
-                            $('#maintain_customer_email').val(data.email);
-                            $('#maintain_customer_phone').val(data.phone || '');
-                            $('#maintain_customer_city').val(data.city || '');
+                    $.ajax({
+                        url: '@Url.Action("GetCustomer", "Maintain")/' + selectedCustomerId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.success) {
+                                $('#maintain_customer_first_name').val(data.first_name);
+                                $('#maintain_customer_last_name').val(data.last_name);
+                                $('#maintain_customer_id').val(data.customer_id);
+                                $('#maintain_customer_email').val(data.email);
+                                $('#maintain_customer_phone').val(data.phone || '');
+                                $('#maintain_customer_city').val(data.city || '');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error loading customer:', error);
                         }
                     });
                 });
@@ -587,16 +603,24 @@
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    $.get('@Url.Action("GetProduct", "Maintain")/' + selectedProductId, function (data) {
-                        if (data.success) {
-                            $('#maintain_product_name').val(data.product_name);
-                            $('#maintain_product_year').val(data.model_year);
-                            $('#maintain_product_price').val(data.list_price);
-                            $('#maintain_product_brand').val(data.brand_id);
-                            $('#maintain_product_category').val(data.category_id);
+                    $.ajax({
+                        url: '@Url.Action("GetProduct", "Maintain")/' + selectedProductId,
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.success) {
+                                $('#maintain_product_name').val(data.product_name);
+                                $('#maintain_product_year').val(data.model_year);
+                                $('#maintain_product_price').val(data.list_price);
+                                $('#maintain_product_brand').val(data.brand_id);
+                                $('#maintain_product_category').val(data.category_id);
 
-                            // Load product image
-                            loadProductImage(data.product_id, brandName, data.product_name);
+                                // Load product image
+                                loadProductImage(data.product_id, brandName, data.product_name);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error loading product:', error);
                         }
                     });
                 });
@@ -697,6 +721,9 @@
                         } else {
                             alert(response.message);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
                     }
                 });
             });
@@ -723,6 +750,9 @@
                             } else {
                                 alert(response.message);
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
                         }
                     });
                 }
@@ -756,6 +786,9 @@
                         } else {
                             alert(response.message);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
                     }
                 });
             });
@@ -782,6 +815,9 @@
                             } else {
                                 alert(response.message);
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
                         }
                     });
                 }
@@ -815,6 +851,9 @@
                         } else {
                             alert(response.message);
                         }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Error: ' + error);
                     }
                 });
             });
@@ -841,6 +880,9 @@
                             } else {
                                 alert(response.message);
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
                         }
                     });
                 }
