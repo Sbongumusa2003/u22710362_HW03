@@ -416,11 +416,21 @@
                 if ($descDiv.is(':visible')) {
                     $descDiv.slideUp();
                 } else {
-                    $.get('@Url.Action("GetFileDescription", "Report")', { fileName: fileName }, function(data) {
-                        if (data.success && data.description) {
-                            $descDiv.html(data.description).slideDown();
-                        } else {
-                            $descDiv.html('<em>No description</em>').slideDown();
+                    $.ajax({
+                        url: '@Url.Action("GetFileDescription", "Report")',
+                        type: 'GET',
+                        data: { fileName: fileName },
+                        dataType: 'json',
+                        success: function(data) {
+                            if (data.success && data.description) {
+                                $descDiv.html(data.description).slideDown();
+                            } else {
+                                $descDiv.html('<em>No description</em>').slideDown();
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error loading description:', error);
+                            $descDiv.html('<em>Error loading description</em>').slideDown();
                         }
                     });
                 }
@@ -447,6 +457,9 @@
                             } else {
                                 alert('Error: ' + response.message);
                             }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('Error: ' + error);
                         }
                     });
                 }
