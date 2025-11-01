@@ -24,7 +24,9 @@ namespace u22710362_HW03.Controllers
                 .Select(g => new
                 {
                     ProductId = g.Key,
-                    TotalOrders = g.Count()
+                    TotalOrders = g.Count(),
+                    TotalQuantity = g.Sum(x => x.quantity),
+                    TotalRevenue = g.Sum(x => x.quantity * x.list_price * (1 - x.discount))
                 })
                 .OrderByDescending(x => x.TotalOrders)
                 .Take(10)
@@ -51,6 +53,9 @@ namespace u22710362_HW03.Controllers
             }
 
             ViewBag.ReportData = JsonConvert.SerializeObject(reportData);
+            ViewBag.TotalProducts = await db.products.CountAsync();
+            ViewBag.TotalOrders = await db.orders.CountAsync();
+            ViewBag.TotalCustomers = await db.customers.CountAsync();
 
             // Get saved files
             var filesPath = Server.MapPath("~/Reports");
@@ -60,7 +65,7 @@ namespace u22710362_HW03.Controllers
             }
 
             var files = Directory.GetFiles(filesPath)
-                .Where(f => !f.EndsWith(".description.txt")) // Exclude description files
+                .Where(f => !f.EndsWith(".description.txt"))
                 .Select(f => new FileInfo(f))
                 .Select(fi => new SavedFileInfo
                 {
@@ -115,6 +120,9 @@ namespace u22710362_HW03.Controllers
                     var plainText = System.Text.RegularExpressions.Regex.Replace(reportHtml, "<.*?>", string.Empty);
                     // Decode HTML entities
                     plainText = System.Net.WebUtility.HtmlDecode(plainText);
+                    // Clean up extra whitespace
+                    plainText = System.Text.RegularExpressions.Regex.Replace(plainText, @"\s+", " ");
+                    plainText = System.Text.RegularExpressions.Regex.Replace(plainText, @"\s*\n\s*", "\n");
                     System.IO.File.WriteAllText(filePath, plainText);
                 }
 
