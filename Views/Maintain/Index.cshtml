@@ -287,8 +287,9 @@
                         </select>
                     </div>
                 </div>
-                <div class="product-image">
-                    <span>Bicycle image</span>
+                <div class="product-image" id="productImageContainer">
+                    <img id="productImage" src="" alt="Product Image" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;" />
+                    <span id="productImagePlaceholder">Bicycle image</span>
                 </div>
             </div>
 
@@ -575,9 +576,60 @@
                             $('#maintain_product_price').val(data.list_price);
                             $('#maintain_product_brand').val(data.brand_id);
                             $('#maintain_product_category').val(data.category_id);
+
+                            // Load product image
+                            loadProductImage(data.product_id, data.brand_id);
                         }
                     });
                 });
+            }
+
+            // Function to load product image
+            function loadProductImage(productId, brandId) {
+                // Get brand name from dropdown
+                var brandName = $('#maintain_product_brand option[value="' + brandId + '"]').text();
+
+                // Try different image extensions
+                var extensions = ['.jpg', '.jpeg', '.png', '.gif'];
+                var imageFound = false;
+
+                // Construct image path: /Content/Images/{ProductId}.{ext} or /Content/Images/{BrandName}.{ext}
+                var imagePaths = [];
+
+                // Try product ID based images first
+                extensions.forEach(function(ext) {
+                    imagePaths.push('/Content/Images/' + productId + ext);
+                });
+
+                // Try brand name based images
+                extensions.forEach(function(ext) {
+                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                    imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                });
+
+                tryLoadImage(imagePaths, 0);
+            }
+
+            // Recursively try to load images
+            function tryLoadImage(paths, index) {
+                if (index >= paths.length) {
+                    // No image found, show placeholder
+                    $('#productImage').hide();
+                    $('#productImagePlaceholder').show();
+                    return;
+                }
+
+                var img = new Image();
+                img.onload = function() {
+                    // Image found
+                    $('#productImage').attr('src', paths[index]).show();
+                    $('#productImagePlaceholder').hide();
+                };
+                img.onerror = function() {
+                    // Try next path
+                    tryLoadImage(paths, index + 1);
+                };
+                img.src = paths[index];
             }
 
             // Initialize lists
