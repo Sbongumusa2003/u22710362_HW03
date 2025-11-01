@@ -1,7 +1,7 @@
 ﻿@model u22710362_HW03.Models.HomeViewModel
 
 @{
-    ViewBag.Title = "Maintain - Bike Store Management";
+    ViewBag.Title = "Home - Bike Store Management";
 }
 
 <style>
@@ -61,16 +61,7 @@
         .list-box li {
             padding: 5px 0;
             border-bottom: 1px solid #eee;
-            cursor: pointer;
         }
-
-            .list-box li:hover {
-                background-color: #f0f0f0;
-            }
-
-            .list-box li.selected {
-                background-color: #e3f2fd;
-            }
 
     .pagination {
         display: flex;
@@ -109,17 +100,20 @@
         margin-top: 15px;
     }
 
-    .product-details {
+    .product-section {
         display: flex;
         gap: 20px;
     }
 
-    .product-form {
+    .product-left {
         flex: 1;
     }
 
+    .product-details {
+        margin-bottom: 20px;
+    }
+
     .product-image {
-        flex: 0 0 200px;
         border: 1px solid #999;
         height: 200px;
         display: flex;
@@ -140,10 +134,10 @@
             font-style: italic;
         }
 
-    .dropdown-label {
+    .filter-section {
         display: flex;
-        align-items: center;
         gap: 10px;
+        align-items: center;
         margin-bottom: 15px;
     }
 
@@ -155,165 +149,236 @@
 </style>
 
 <div class="container-fluid mt-4">
-    <h2>Maintain</h2>
+    <h2>Home</h2>
 
     @Html.AntiForgeryToken()
 
     <div class="section-container">
         <!-- Staff Section -->
         <div class="section-box">
-            <div class="dropdown-label">
-                <h4>Staff Management</h4>
-            </div>
+            <h4>Staff</h4>
 
             <div class="form-row">
                 <label>First Name</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_staff_first_name">
+                <input type="text" class="form-control form-control-sm" id="staff_first_name">
             </div>
             <div class="form-row">
                 <label>Last Name</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_staff_last_name">
+                <input type="text" class="form-control form-control-sm" id="staff_last_name">
             </div>
             <div class="form-row">
                 <label>Staff ID</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_staff_id" readonly>
+                <input type="text" class="form-control form-control-sm" id="staff_id" readonly>
             </div>
             <div class="form-row">
-                <label>Email</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_staff_email">
-            </div>
-            <div class="form-row">
-                <label>Phone</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_staff_phone">
-            </div>
-            <div class="form-row">
-                <label>Active</label>
-                <select class="form-select form-select-sm" id="maintain_staff_active">
-                    <option value="1">Yes</option>
-                    <option value="0">No</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <label>Store</label>
-                <select class="form-select form-select-sm" id="maintain_staff_store">
-                    @foreach (var store in ViewBag.Stores)
-                    {
-                        <option value="@store.store_id">@store.store_name</option>
-                    }
-                </select>
+                <label>...</label>
+                <input type="text" class="form-control form-control-sm" id="staff_other" placeholder="Additional fields">
             </div>
 
             <div class="list-box">
-                <ul id="maintainStaffList"></ul>
+                <ul id="staffList">
+                    <li>Sold Item One</li>
+                    <li>Sold Item Two</li>
+                    <li>Sold Item Three</li>
+                </ul>
             </div>
 
             <div class="page-info" id="staffPageInfo">Page 1 of 1</div>
-            <div class="pagination" id="staffPagination"></div>
+            <div class="pagination" id="staffPagination">
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>4</button>
+                <button>...</button>
+                <button>&gt;</button>
+                <button>&lt;</button>
+                <button>&gt;&gt;</button>
+            </div>
 
             <div class="action-buttons">
-                <button class="btn btn-sm btn-primary" id="updateStaffBtn">Update</button>
-                <button class="btn btn-sm btn-danger" id="deleteStaffBtn">Delete</button>
+                <button class="btn btn-sm btn-primary" id="createStaffBtn">Create</button>
             </div>
         </div>
 
         <!-- Customers Section -->
         <div class="section-box">
-            <div class="dropdown-label">
-                <h4>Customer Management</h4>
-            </div>
+            <h4>Customers</h4>
 
             <div class="form-row">
                 <label>First Name</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_customer_first_name">
+                <input type="text" class="form-control form-control-sm" id="customer_first_name">
             </div>
             <div class="form-row">
                 <label>Last Name</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_customer_last_name">
+                <input type="text" class="form-control form-control-sm" id="customer_last_name">
             </div>
             <div class="form-row">
                 <label>Customer ID</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_customer_id" readonly>
+                <input type="text" class="form-control form-control-sm" id="customer_id" readonly>
             </div>
             <div class="form-row">
-                <label>Email</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_customer_email">
-            </div>
-            <div class="form-row">
-                <label>Phone</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_customer_phone">
-            </div>
-            <div class="form-row">
-                <label>City</label>
-                <input type="text" class="form-control form-control-sm" id="maintain_customer_city">
+                <label>...</label>
+                <input type="text" class="form-control form-control-sm" id="customer_other" placeholder="Additional fields">
             </div>
 
             <div class="list-box">
-                <ul id="maintainCustomerList"></ul>
+                <ul id="customerList">
+                    <li>Purchased Item One</li>
+                    <li>Purchased Item Two</li>
+                    <li>Purchased Item Three</li>
+                </ul>
             </div>
 
             <div class="page-info" id="customerPageInfo">Page 1 of 1</div>
-            <div class="pagination" id="customerPagination"></div>
+            <div class="pagination" id="customerPagination">
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <button>4</button>
+                <button>...</button>
+                <button>&gt;</button>
+                <button>&lt;</button>
+                <button>&gt;&gt;</button>
+            </div>
 
             <div class="action-buttons">
-                <button class="btn btn-sm btn-primary" id="updateCustomerBtn">Update</button>
-                <button class="btn btn-sm btn-danger" id="deleteCustomerBtn">Delete</button>
+                <button class="btn btn-sm btn-primary" id="createCustomerBtn">Create</button>
             </div>
         </div>
 
         <!-- Products Section -->
         <div class="section-box">
-            <div class="dropdown-label">
-                <h4>Product Management</h4>
-            </div>
+            <h4>Products</h4>
 
-            <div class="product-details">
-                <div class="product-form">
-                    <div class="form-row">
-                        <label>Product Name</label>
-                        <input type="text" class="form-control form-control-sm" id="maintain_product_name">
-                    </div>
-                    <div class="form-row">
-                        <label>Model Year</label>
-                        <input type="number" class="form-control form-control-sm" id="maintain_product_year">
-                    </div>
-                    <div class="form-row">
-                        <label>Price</label>
-                        <input type="number" step="0.01" class="form-control form-control-sm" id="maintain_product_price">
-                    </div>
-                    <div class="form-row">
-                        <label>Brand</label>
-                        <select class="form-select form-select-sm" id="maintain_product_brand">
-                            @foreach (var brand in ViewBag.Brands)
-                            {
-                                <option value="@brand.brand_id">@brand.brand_name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <label>Category</label>
-                        <select class="form-select form-select-sm" id="maintain_product_category">
-                            @foreach (var category in ViewBag.Categories)
-                            {
-                                <option value="@category.category_id">@category.category_name</option>
-                            }
-                        </select>
+            <div class="product-section">
+                <div class="product-left">
+                    <div class="product-details">
+                        <div class="filter-section">
+                            <select class="form-select form-select-sm" id="productBrandFilter" style="width: 150px;">
+                                <option value="">All Brands</option>
+                                @foreach (var brand in ViewBag.Brands)
+                                {
+                                    <option value="@brand.brand_id">@brand.brand_name</option>
+                                }
+                            </select>
+                            <select class="form-select form-select-sm" id="productCategoryFilter" style="width: 150px;">
+                                <option value="">All Categories</option>
+                                @foreach (var category in ViewBag.Categories)
+                                {
+                                    <option value="@category.category_id">@category.category_name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <input type="text" class="form-control form-control-sm mb-2" id="product_detail_1" placeholder="Product details">
+                        <input type="text" class="form-control form-control-sm mb-2" id="product_detail_2" placeholder="More details">
+                        <input type="text" class="form-control form-control-sm" id="product_detail_3" placeholder="Additional info">
                     </div>
                 </div>
+
                 <div class="product-image" id="productImageContainer">
                     <span class="placeholder-text">Bicycle image</span>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
 
-            <div class="list-box" style="margin-top: 15px;">
-                <ul id="maintainProductList"></ul>
+<!-- Modal for Staff Creation -->
+<div class="modal fade" id="staffModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Staff</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="modal_staff_first_name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="modal_staff_last_name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="modal_staff_email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="modal_staff_phone">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Active</label>
+                    <select class="form-select" id="modal_staff_active">
+                        <option value="1">Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Store</label>
+                    <select class="form-select" id="modal_staff_store">
+                        @foreach (var store in ViewBag.Stores)
+                        {
+                            <option value="@store.store_id">@store.store_name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveStaffBtn">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <div class="page-info" id="productPageInfo">Page 1 of 1</div>
-            <div class="pagination" id="productPagination"></div>
-
-            <div class="action-buttons">
-                <button class="btn btn-sm btn-primary" id="updateProductBtn">Update</button>
-                <button class="btn btn-sm btn-danger" id="deleteProductBtn">Delete</button>
+<!-- Modal for Customer Creation -->
+<div class="modal fade" id="customerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="modal_customer_first_name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="modal_customer_last_name">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" id="modal_customer_email">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" id="modal_customer_phone">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Street</label>
+                    <input type="text" class="form-control" id="modal_customer_street">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">City</label>
+                    <input type="text" class="form-control" id="modal_customer_city">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">State</label>
+                    <input type="text" class="form-control" id="modal_customer_state">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Zip Code</label>
+                    <input type="text" class="form-control" id="modal_customer_zip">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveCustomerBtn">Save</button>
             </div>
         </div>
     </div>
@@ -322,11 +387,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            var selectedStaffId = null;
-            var selectedCustomerId = null;
-            var selectedProductId = null;
-
-            // Pagination data - serialize only needed properties
             var staffData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
                 Model.Staffs.Select(s => new {
                     staff_id = s.staff_id,
@@ -335,8 +395,7 @@
                     email = s.email,
                     phone = s.phone,
                     active = s.active,
-                    store_id = s.store_id,
-                    stores = new { store_name = s.stores != null ? s.stores.store_name : "N/A" }
+                    store_id = s.store_id
                 }).ToList()
             ));
 
@@ -347,8 +406,8 @@
                     last_name = c.last_name,
                     email = c.email,
                     phone = c.phone,
-                    city = c.city,
                     street = c.street,
+                    city = c.city,
                     state = c.state,
                     zip_code = c.zip_code
                 }).ToList()
@@ -365,94 +424,9 @@
                 }).ToList()
             ));
 
+            var itemsPerPage = 10;
             var staffCurrentPage = 1;
             var customerCurrentPage = 1;
-            var productCurrentPage = 1;
-            var itemsPerPage = 10;
-
-            // Pagination function
-            function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
-                var totalPages = Math.ceil(totalItems / itemsPerPage);
-                var $pagination = $('#' + paginationElementId);
-                $pagination.empty();
-
-                if (totalPages <= 1) return;
-
-                // First button
-                var $first = $('<button>&lt;&lt;</button>');
-                $first.prop('disabled', currentPage === 1);
-                $first.click(function() {
-                    if (currentPage !== 1) {
-                        onPageChange(1);
-                    }
-                });
-                $pagination.append($first);
-
-                // Previous button
-                var $prev = $('<button>&lt;</button>');
-                $prev.prop('disabled', currentPage === 1);
-                $prev.click(function() {
-                    if (currentPage > 1) {
-                        onPageChange(currentPage - 1);
-                    }
-                });
-                $pagination.append($prev);
-
-                // Page numbers
-                var startPage = Math.max(1, currentPage - 2);
-                var endPage = Math.min(totalPages, currentPage + 2);
-
-                if (startPage > 1) {
-                    var $page1 = $('<button>1</button>');
-                    $page1.click(function() { onPageChange(1); });
-                    $pagination.append($page1);
-
-                    if (startPage > 2) {
-                        $pagination.append($('<button disabled>...</button>'));
-                    }
-                }
-
-                for (var i = startPage; i <= endPage; i++) {
-                    var $pageBtn = $('<button>' + i + '</button>');
-                    if (i === currentPage) {
-                        $pageBtn.addClass('active');
-                    }
-                    $pageBtn.data('page', i);
-                    $pageBtn.click(function() {
-                        onPageChange($(this).data('page'));
-                    });
-                    $pagination.append($pageBtn);
-                }
-
-                if (endPage < totalPages) {
-                    if (endPage < totalPages - 1) {
-                        $pagination.append($('<button disabled>...</button>'));
-                    }
-                    var $pageLast = $('<button>' + totalPages + '</button>');
-                    $pageLast.click(function() { onPageChange(totalPages); });
-                    $pagination.append($pageLast);
-                }
-
-                // Next button
-                var $next = $('<button>&gt;</button>');
-                $next.prop('disabled', currentPage === totalPages);
-                $next.click(function() {
-                    if (currentPage < totalPages) {
-                        onPageChange(currentPage + 1);
-                    }
-                });
-                $pagination.append($next);
-
-                // Last button
-                var $last = $('<button>&gt;&gt;</button>');
-                $last.prop('disabled', currentPage === totalPages);
-                $last.click(function() {
-                    if (currentPage !== totalPages) {
-                        onPageChange(totalPages);
-                    }
-                });
-                $pagination.append($last);
-            }
 
             // Display staff list
             function displayStaffList(page) {
@@ -461,23 +435,17 @@
                 var end = start + itemsPerPage;
                 var pageData = staffData.slice(start, end);
 
-                var $list = $('#maintainStaffList');
+                var $list = $('#staffList');
                 $list.empty();
 
                 pageData.forEach(function(staff) {
-                    var $li = $('<li class="staff-item"></li>');
-                    $li.attr('data-id', staff.staff_id);
-                    $li.text(staff.first_name + ' ' + staff.last_name + ' - ' + (staff.stores ? staff.stores.store_name : 'N/A'));
+                    var $li = $('<li></li>');
+                    $li.text('Sold by: ' + staff.first_name + ' ' + staff.last_name);
                     $list.append($li);
                 });
 
-                createPagination(staffData.length, page, 'staffPagination', displayStaffList);
-
                 var totalPages = Math.ceil(staffData.length / itemsPerPage);
                 $('#staffPageInfo').text('Page ' + page + ' of ' + totalPages);
-
-                // Reattach click handlers
-                attachStaffClickHandlers();
             }
 
             // Display customer list
@@ -487,189 +455,61 @@
                 var end = start + itemsPerPage;
                 var pageData = customerData.slice(start, end);
 
-                var $list = $('#maintainCustomerList');
+                var $list = $('#customerList');
                 $list.empty();
 
                 pageData.forEach(function(customer) {
-                    var $li = $('<li class="customer-item"></li>');
-                    $li.attr('data-id', customer.customer_id);
-                    $li.text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
+                    var $li = $('<li></li>');
+                    $li.text('Purchased by: ' + customer.first_name + ' ' + customer.last_name);
                     $list.append($li);
                 });
-
-                createPagination(customerData.length, page, 'customerPagination', displayCustomerList);
 
                 var totalPages = Math.ceil(customerData.length / itemsPerPage);
                 $('#customerPageInfo').text('Page ' + page + ' of ' + totalPages);
-
-                // Reattach click handlers
-                attachCustomerClickHandlers();
             }
 
-            // Display product list
-            function displayProductList(page) {
-                productCurrentPage = page;
-                var start = (page - 1) * itemsPerPage;
-                var end = start + itemsPerPage;
-                var pageData = productData.slice(start, end);
+            // Filter products
+            function filterProducts() {
+                var brandId = $('#productBrandFilter').val();
+                var categoryId = $('#productCategoryFilter').val();
 
-                var $list = $('#maintainProductList');
-                $list.empty();
-
-                pageData.forEach(function(product) {
-                    var $li = $('<li class="product-item"></li>');
-                    $li.attr('data-id', product.product_id);
-                    $li.text(product.product_name + ' - $' + product.list_price);
-                    $list.append($li);
-                });
-
-                createPagination(productData.length, page, 'productPagination', displayProductList);
-
-                var totalPages = Math.ceil(productData.length / itemsPerPage);
-                $('#productPageInfo').text('Page ' + page + ' of ' + totalPages);
-
-                // Reattach click handlers
-                attachProductClickHandlers();
-            }
-
-            // Attach staff click handlers
-            function attachStaffClickHandlers() {
-                $('.staff-item').click(function () {
-                    selectedStaffId = $(this).data('id');
-                    $('.staff-item').removeClass('selected');
-                    $(this).addClass('selected');
-
-                    $.get('@Url.Action("GetStaff", "Maintain")/' + selectedStaffId, function (data) {
-                        if (data.success) {
-                            $('#maintain_staff_first_name').val(data.first_name);
-                            $('#maintain_staff_last_name').val(data.last_name);
-                            $('#maintain_staff_id').val(data.staff_id);
-                            $('#maintain_staff_email').val(data.email);
-                            $('#maintain_staff_phone').val(data.phone || '');
-                            $('#maintain_staff_active').val(data.active);
-                            $('#maintain_staff_store').val(data.store_id);
-                        }
-                    });
-                });
-            }
-
-            // Attach customer click handlers
-            function attachCustomerClickHandlers() {
-                $('.customer-item').click(function () {
-                    selectedCustomerId = $(this).data('id');
-                    $('.customer-item').removeClass('selected');
-                    $(this).addClass('selected');
-
-                    $.get('@Url.Action("GetCustomer", "Maintain")/' + selectedCustomerId, function (data) {
-                        if (data.success) {
-                            $('#maintain_customer_first_name').val(data.first_name);
-                            $('#maintain_customer_last_name').val(data.last_name);
-                            $('#maintain_customer_id').val(data.customer_id);
-                            $('#maintain_customer_email').val(data.email);
-                            $('#maintain_customer_phone').val(data.phone || '');
-                            $('#maintain_customer_city').val(data.city || '');
-                        }
-                    });
-                });
-            }
-
-            // Attach product click handlers
-            function attachProductClickHandlers() {
-                $('.product-item').click(function () {
-                    selectedProductId = $(this).data('id');
-                    $('.product-item').removeClass('selected');
-                    $(this).addClass('selected');
-
-                    $.get('@Url.Action("GetProduct", "Maintain")/' + selectedProductId, function (data) {
-                        if (data.success) {
-                            $('#maintain_product_name').val(data.product_name);
-                            $('#maintain_product_year').val(data.model_year);
-                            $('#maintain_product_price').val(data.list_price);
-                            $('#maintain_product_brand').val(data.brand_id);
-                            $('#maintain_product_category').val(data.category_id);
-
-                            // Display product image
-                            var product = {
-                                product_id: data.product_id,
-                                product_name: data.product_name
-                            };
-                            displayProductImage(product);
-                        }
-                    });
-                });
-            }
-
-            // Function to display product image
-            function displayProductImage(product) {
-                var $imageContainer = $('#productImageContainer');
-
-                // Create image filename based on product name or ID
-                var imageName = product.product_name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-
-                // Try alternative image paths
-                var imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
-                var imagePaths = imageExtensions.map(ext => '@Url.Content("~/Content/Images/")' + imageName + ext);
-
-                // Also try with product ID
-                imagePaths.push('@Url.Content("~/Content/Images/")' + product.product_id + '.jpg');
-                imagePaths.push('@Url.Content("~/Content/Images/")' + product.product_id + '.png');
-
-                // Try to load image
-                var img = new Image();
-                var imageLoaded = false;
-                var currentPathIndex = 0;
-
-                function tryNextImage() {
-                    if (currentPathIndex < imagePaths.length && !imageLoaded) {
-                        img.src = imagePaths[currentPathIndex];
-                        currentPathIndex++;
-                    } else if (!imageLoaded) {
-                        // No image found, show placeholder
-                        $imageContainer.html('<span class="placeholder-text">No image available</span>');
+                $.ajax({
+                    url: '@Url.Action("FilterProducts", "Home")',
+                    type: 'GET',
+                    data: { brandId: brandId, categoryId: categoryId },
+                    success: function(data) {
+                        console.log('Filtered products:', data);
+                        // Update product display here
                     }
-                }
-
-                img.onload = function() {
-                    imageLoaded = true;
-                    $imageContainer.html('<img src="' + img.src + '" alt="' + product.product_name + '">');
-                };
-
-                img.onerror = function() {
-                    tryNextImage();
-                };
-
-                // Start trying images
-                tryNextImage();
+                });
             }
 
-            // Initialize lists
+            // Initialize
             displayStaffList(1);
             displayCustomerList(1);
-            displayProductList(1);
 
-            // Update Staff
-            $('#updateStaffBtn').click(function () {
-                if (!selectedStaffId) {
-                    alert('Please select a staff member first');
-                    return;
-                }
+            // Create Staff
+            $('#createStaffBtn').click(function() {
+                var staffModal = new bootstrap.Modal(document.getElementById('staffModal'));
+                staffModal.show();
+            });
 
+            $('#saveStaffBtn').click(function() {
                 var data = {
-                    staff_id: selectedStaffId,
-                    first_name: $('#maintain_staff_first_name').val(),
-                    last_name: $('#maintain_staff_last_name').val(),
-                    email: $('#maintain_staff_email').val(),
-                    phone: $('#maintain_staff_phone').val(),
-                    active: $('#maintain_staff_active').val(),
-                    store_id: $('#maintain_staff_store').val(),
+                    first_name: $('#modal_staff_first_name').val(),
+                    last_name: $('#modal_staff_last_name').val(),
+                    email: $('#modal_staff_email').val(),
+                    phone: $('#modal_staff_phone').val(),
+                    active: $('#modal_staff_active').val(),
+                    store_id: $('#modal_staff_store').val(),
                     __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                 };
 
                 $.ajax({
-                    url: '@Url.Action("EditStaff", "Maintain")',
+                    url: '@Url.Action("CreateStaff", "Home")',
                     type: 'POST',
                     data: data,
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             alert(response.message);
                             location.reload();
@@ -680,55 +520,30 @@
                 });
             });
 
-            // Delete Staff
-            $('#deleteStaffBtn').click(function () {
-                if (!selectedStaffId) {
-                    alert('Please select a staff member first');
-                    return;
-                }
-
-                if (confirm('Are you sure you want to delete this staff member?')) {
-                    $.ajax({
-                        url: '@Url.Action("DeleteStaff", "Maintain")',
-                        type: 'POST',
-                        data: {
-                            id: selectedStaffId,
-                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                alert(response.message);
-                                location.reload();
-                            } else {
-                                alert(response.message);
-                            }
-                        }
-                    });
-                }
+            // Create Customer
+            $('#createCustomerBtn').click(function() {
+                var customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
+                customerModal.show();
             });
 
-            // Update Customer
-            $('#updateCustomerBtn').click(function () {
-                if (!selectedCustomerId) {
-                    alert('Please select a customer first');
-                    return;
-                }
-
+            $('#saveCustomerBtn').click(function() {
                 var data = {
-                    customer_id: selectedCustomerId,
-                    first_name: $('#maintain_customer_first_name').val(),
-                    last_name: $('#maintain_customer_last_name').val(),
-                    email: $('#maintain_customer_email').val(),
-                    phone: $('#maintain_customer_phone').val(),
-                    city: $('#maintain_customer_city').val(),
+                    first_name: $('#modal_customer_first_name').val(),
+                    last_name: $('#modal_customer_last_name').val(),
+                    email: $('#modal_customer_email').val(),
+                    phone: $('#modal_customer_phone').val(),
+                    street: $('#modal_customer_street').val(),
+                    city: $('#modal_customer_city').val(),
+                    state: $('#modal_customer_state').val(),
+                    zip_code: $('#modal_customer_zip').val(),
                     __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                 };
 
                 $.ajax({
-                    url: '@Url.Action("EditCustomer", "Maintain")',
+                    url: '@Url.Action("CreateCustomer", "Home")',
                     type: 'POST',
                     data: data,
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             alert(response.message);
                             location.reload();
@@ -739,91 +554,8 @@
                 });
             });
 
-            // Delete Customer
-            $('#deleteCustomerBtn').click(function () {
-                if (!selectedCustomerId) {
-                    alert('Please select a customer first');
-                    return;
-                }
-
-                if (confirm('Are you sure you want to delete this customer?')) {
-                    $.ajax({
-                        url: '@Url.Action("DeleteCustomer", "Maintain")',
-                        type: 'POST',
-                        data: {
-                            id: selectedCustomerId,
-                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                alert(response.message);
-                                location.reload();
-                            } else {
-                                alert(response.message);
-                            }
-                        }
-                    });
-                }
-            });
-
-            // Update Product
-            $('#updateProductBtn').click(function () {
-                if (!selectedProductId) {
-                    alert('Please select a product first');
-                    return;
-                }
-
-                var data = {
-                    product_id: selectedProductId,
-                    product_name: $('#maintain_product_name').val(),
-                    model_year: $('#maintain_product_year').val(),
-                    list_price: $('#maintain_product_price').val(),
-                    brand_id: $('#maintain_product_brand').val(),
-                    category_id: $('#maintain_product_category').val(),
-                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                };
-
-                $.ajax({
-                    url: '@Url.Action("EditProduct", "Maintain")',
-                    type: 'POST',
-                    data: data,
-                    success: function (response) {
-                        if (response.success) {
-                            alert(response.message);
-                            location.reload();
-                        } else {
-                            alert(response.message);
-                        }
-                    }
-                });
-            });
-
-            // Delete Product
-            $('#deleteProductBtn').click(function () {
-                if (!selectedProductId) {
-                    alert('Please select a product first');
-                    return;
-                }
-
-                if (confirm('Are you sure you want to delete this product?')) {
-                    $.ajax({
-                        url: '@Url.Action("DeleteProduct", "Maintain")',
-                        type: 'POST',
-                        data: {
-                            id: selectedProductId,
-                            __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function (response) {
-                            if (response.success) {
-                                alert(response.message);
-                                location.reload();
-                            } else {
-                                alert(response.message);
-                            }
-                        }
-                    });
-                }
-            });
+            // Product filtering
+            $('#productBrandFilter, #productCategoryFilter').change(filterProducts);
         });
     </script>
 }
