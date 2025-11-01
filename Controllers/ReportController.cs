@@ -18,68 +18,76 @@ namespace u22710362_HW03.Controllers
         // GET: Report
         public async Task<ActionResult> Index()
         {
-            // Get report data - Popular Products Report
-            var popularProducts = await db.order_items
-                .GroupBy(oi => oi.product_id)
-                .Select(g => new
-                {
-                    ProductId = g.Key,
-                    TotalOrders = g.Count(),
-                    TotalQuantity = g.Sum(x => x.quantity),
-                    TotalRevenue = g.Sum(x => x.quantity * x.list_price * (1 - x.discount))
-                })
-                .OrderByDescending(x => x.TotalOrders)
-                .Take(10)
-                .ToListAsync();
-
-            var reportData = new List<ReportDataItem>();
-            foreach (var item in popularProducts)
+            try
             {
-                var product = await db.products
-                    .Include(p => p.brands)
-                    .Include(p => p.categories)
-                    .FirstOrDefaultAsync(p => p.product_id == item.ProductId);
-
-                if (product != null)
-                {
-                    reportData.Add(new ReportDataItem
+                // Get report data - Popular Products Report
+                var popularProducts = await db.order_items
+                    .GroupBy(oi => oi.product_id)
+                    .Select(g => new
                     {
-                        Label = product.product_name,
-                        Value = item.TotalOrders,
-                        Brand = product.brands?.brand_name,
-                        Category = product.categories?.category_name
-                    });
-                }
-            }
+                        ProductId = g.Key,
+                        TotalOrders = g.Count()
+                    })
+                    .OrderByDescending(x => x.TotalOrders)
+                    .Take(10)
+                    .ToListAsync();
 
-            ViewBag.ReportData = JsonConvert.SerializeObject(reportData);
-            ViewBag.TotalProducts = await db.products.CountAsync();
-            ViewBag.TotalOrders = await db.orders.CountAsync();
-            ViewBag.TotalCustomers = await db.customers.CountAsync();
-
-            // Get saved files
-            var filesPath = Server.MapPath("~/Reports");
-            if (!Directory.Exists(filesPath))
-            {
-                Directory.CreateDirectory(filesPath);
-            }
-
-            var files = Directory.GetFiles(filesPath)
-                .Where(f => !f.EndsWith(".description.txt"))
-                .Select(f => new FileInfo(f))
-                .Select(fi => new SavedFileInfo
+                var reportData = new List<ReportDataItem>();
+                foreach (var item in popularProducts)
                 {
-                    FileName = fi.Name,
-                    FileSize = fi.Length,
-                    CreatedDate = fi.CreationTime,
-                    FilePath = fi.FullName
-                })
-                .OrderByDescending(f => f.CreatedDate)
-                .ToList();
+                    var product = await db.products
+                        .Include(p => p.brands)
+                        .Include(p => p.categories)
+                        .FirstOrDefaultAsync(p => p.product_id == item.ProductId);
 
-            ViewBag.SavedFiles = files;
+                    if (product != null)
+                    {
+                        reportData.Add(new ReportDataItem
+                        {
+                            Label = product.product_name,
+                            Value = item.TotalOrders,
+                            Brand = product.brands?.brand_name ?? "N/A",
+                            Category = product.categories?.category_name ?? "N/A"
+                        });
+                    }
+                }
 
-            return View();
+                ViewBag.ReportData = JsonConvert.SerializeObject(reportData);
+                ViewBag.TotalProducts = await db.products.CountAsync();
+                ViewBag.TotalOrders = await db.orders.CountAsync();
+                ViewBag.TotalCustomers = await db.customers.CountAsync();
+
+                // Get saved files from Reports folder
+                var filesPath = Server.MapPath("~/Reports");
+                if (!Directory.Exists(filesPath))
+                {
+                    Directory.CreateDirectory(filesPath);
+                }
+
+                var files = Directory.GetFiles(filesPath)
+                    .Where(f => !f.EndsWith(".description.txt"))
+                    .Select(f => new FileInfo(f))
+                    .Select(fi => new SavedFileInfo
+                    {
+                        FileName = fi.Name,
+                        FileSize = fi.Length,
+                        CreatedDate = fi.CreationTime,
+                        FilePath = fi.FullName
+                    })
+                    .OrderByDescending(f => f.CreatedDate)
+                    .ToList();
+
+                ViewBag.SavedFiles = files;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = "Error loading report: " + ex.Message;
+                ViewBag.ReportData = "[]";
+                ViewBag.SavedFiles = new List<SavedFileInfo>();
+                return View();
+            }
         }
 
         // POST: Report/SaveReport
@@ -95,7 +103,7 @@ namespace u22710362_HW03.Controllers
                 }
 
                 // Clean filename
-                fileName = fileName.Trim();
+                fileName = fileName?.Trim();
                 if (string.IsNullOrEmpty(fileName))
                 {
                     fileName = "Report";
@@ -118,9 +126,7 @@ namespace u22710362_HW03.Controllers
                 {
                     // Strip HTML tags for text file
                     var plainText = System.Text.RegularExpressions.Regex.Replace(reportHtml, "<.*?>", string.Empty);
-                    // Decode HTML entities
                     plainText = System.Net.WebUtility.HtmlDecode(plainText);
-                    // Clean up extra whitespace
                     plainText = System.Text.RegularExpressions.Regex.Replace(plainText, @"\s+", " ");
                     plainText = System.Text.RegularExpressions.Regex.Replace(plainText, @"\s*\n\s*", "\n");
                     System.IO.File.WriteAllText(filePath, plainText);
@@ -196,6 +202,7 @@ namespace u22710362_HW03.Controllers
         }
 
         // GET: Report/GetFileDescription
+        [HttpGet]
         public ActionResult GetFileDescription(string fileName)
         {
             try
