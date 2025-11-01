@@ -770,7 +770,7 @@
 
                 // Try product ID based images first
                 extensions.forEach(function(ext) {
-                    imagePaths.push('/Content/Images/' + productId + ext);
+                    imagePaths.push('~/Content/Images/' + productId + ext);
                 });
 
                 // Try product name variations
@@ -778,28 +778,28 @@
                 if (product && product.product_name) {
                     var productNameClean = product.product_name.replace(/[^a-zA-Z0-9]/g, '_');
                     extensions.forEach(function(ext) {
-                        imagePaths.push('/Content/Images/' + productNameClean + ext);
+                        imagePaths.push('~/Content/Images/' + productNameClean + ext);
                     });
                     var productNameNoSpaces = product.product_name.replace(/\s+/g, '');
                     extensions.forEach(function(ext) {
-                        imagePaths.push('/Content/Images/' + productNameNoSpaces + ext);
+                        imagePaths.push('~/Content/Images/' + productNameNoSpaces + ext);
                     });
                 }
 
                 // Try brand name based images
                 if (brandName) {
                     extensions.forEach(function(ext) {
-                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
-                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
-                        imagePaths.push('/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
+                        imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
+                        imagePaths.push('~/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
                     });
                 }
 
                 // Try generic bicycle image
                 extensions.forEach(function(ext) {
-                    imagePaths.push('/Content/Images/bicycle' + ext);
-                    imagePaths.push('/Content/Images/bike' + ext);
-                    imagePaths.push('/Content/Images/default' + ext);
+                    imagePaths.push('~/Content/Images/bicycle' + ext);
+                    imagePaths.push('~/Content/Images/bike' + ext);
+                    imagePaths.push('~/Content/Images/default' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
