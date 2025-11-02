@@ -8,23 +8,21 @@
     @Scripts.Render("~/bundles/modernizr")
 
     <style>
-        /* Page Transition */
         .page-content {
             animation: fadeIn 0.5s ease;
         }
 
-        keyframes fadeIn {
+        @@keyframes fadeIn {
             from {
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
         }
-
-        /* Loading Overlay */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -38,9 +36,9 @@
             z-index: 9999;
         }
 
-        .loading-overlay.active {
-            display: flex;
-        }
+            .loading-overlay.active {
+                display: flex;
+            }
 
         .spinner {
             width: 50px;
@@ -49,6 +47,16 @@
             border-top: 4px solid #2a5298;
             border-radius: 50%;
             animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Navbar Active State */
@@ -74,11 +82,12 @@
             animation: slideInRight 0.3s ease;
         }
 
-        keyframes slideInRight {
+        @@keyframes slideInRight {
             from {
                 transform: translateX(400px);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -134,8 +143,7 @@
     @Scripts.Render("~/bundles/bootstrap")
 
     <script>
-        $(document).ready(function() {
-            // Set active nav link based on current page
+        $(document).ready(function () {
             var path = window.location.pathname.toLowerCase();
             if (path.includes('/maintain')) {
                 $('#nav-maintain').addClass('active');
@@ -144,30 +152,42 @@
             } else {
                 $('#nav-home').addClass('active');
             }
-
-            // Show loading overlay on form submission
-            $('form').on('submit', function() {
+            $('form').on('submit', function () {
                 $('#loadingOverlay').addClass('active');
             });
-
-            // Auto-hide alerts after 5 seconds
-            setTimeout(function() {
+            setTimeout(function () {
                 $('.alert').fadeOut('slow');
             }, 5000);
 
-            // Add smooth scroll behavior
             $('html').css('scroll-behavior', 'smooth');
-
-            // Add hover effect to buttons
             $('.btn').hover(
-                function() {
+                function () {
                     $(this).css('cursor', 'pointer');
                 }
             );
+            var submitted = false;
+            $('form').on('submit', function (e) {
+                if (submitted) {
+                    e.preventDefault();
+                    return false;
+                }
+                submitted = true;
+                setTimeout(function () {
+                    submitted = false;
+                }, 3000);
+            });
 
-            // Prevent double submission
-            $('form').on('submit', function() {
-                $(this).find('button[type="submit"]').prop('disabled', true);
+            $('input[required], select[required], textarea[required]').on('blur', function () {
+                if (!$(this).val()) {
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            $('input, select, textarea').on('input change', function () {
+                if ($(this).hasClass('is-invalid') && $(this).val()) {
+                    $(this).removeClass('is-invalid');
+                }
             });
         });
     </script>
