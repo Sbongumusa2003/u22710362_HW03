@@ -374,7 +374,6 @@
             var selectedCustomerId = null;
             var selectedProductId = null;
 
-            // NO AJAX - All data embedded at page load
             var staffData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
                 Model.Staffs.Select(s => new {
                     staff_id = s.staff_id,
@@ -421,7 +420,6 @@
             var productCurrentPage = 1;
             var itemsPerPage = 10;
 
-            // PURE JQUERY - Pagination function
             function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
                 var $pagination = $('#' + paginationElementId);
@@ -474,7 +472,6 @@
                 );
             }
 
-            // PURE JQUERY - Display staff list
             function displayStaffList(page) {
                 staffCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -498,7 +495,6 @@
                 attachStaffClickHandlers();
             }
 
-            // PURE JQUERY - Display customer list
             function displayCustomerList(page) {
                 customerCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -521,7 +517,6 @@
                 attachCustomerClickHandlers();
             }
 
-            // PURE JQUERY - Display product list
             function displayProductList(page) {
                 productCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -546,14 +541,12 @@
                 attachProductClickHandlers();
             }
 
-            // PURE JQUERY - Attach staff click handlers (NO AJAX - uses local data)
             function attachStaffClickHandlers() {
                 $('#maintainStaffList').off('click', '.staff-item').on('click', '.staff-item', function() {
                     selectedStaffId = $(this).data('id');
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    // Find staff in local data (NO AJAX)
                     var staff = $.grep(staffData, function(s) { return s.staff_id === selectedStaffId; })[0];
 
                     if (staff) {
@@ -570,14 +563,12 @@
                 });
             }
 
-            // PURE JQUERY - Attach customer click handlers (NO AJAX - uses local data)
             function attachCustomerClickHandlers() {
                 $('#maintainCustomerList').off('click', '.customer-item').on('click', '.customer-item', function() {
                     selectedCustomerId = $(this).data('id');
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    // Find customer in local data (NO AJAX)
                     var customer = $.grep(customerData, function(c) { return c.customer_id === selectedCustomerId; })[0];
 
                     if (customer) {
@@ -593,7 +584,6 @@
                 });
             }
 
-            // PURE JQUERY - Attach product click handlers (NO AJAX - uses local data)
             function attachProductClickHandlers() {
                 $('#maintainProductList').off('click', '.product-item').on('click', '.product-item', function() {
                     selectedProductId = $(this).data('id');
@@ -603,7 +593,6 @@
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    // Find product in local data (NO AJAX)
                     var product = $.grep(productData, function(p) { return p.product_id === selectedProductId; })[0];
 
                     if (product) {
@@ -620,12 +609,10 @@
                 });
             }
 
-            // PURE JQUERY - Load product image (FIXED PATH)
             function loadProductImage(productId, brandName, productName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
-                // Use proper URL path (remove ~/ and use absolute path starting with /)
                 $.each(extensions, function(index, ext) {
                     imagePaths.push('/Images/' + productId + ext);
                 });
@@ -650,7 +637,6 @@
                 tryLoadImage(imagePaths, 0);
             }
 
-            // PURE JQUERY - Try loading images recursively
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
                     $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
@@ -676,12 +662,10 @@
                     .attr('src', paths[index]);
             }
 
-            // Initialize lists
             displayStaffList(1);
             displayCustomerList(1);
             displayProductList(1);
 
-            // PURE JQUERY - Form validation before submit (NO AJAX - traditional POST)
             $('#staffForm').on('submit', function(e) {
                 if (!selectedStaffId) {
                     e.preventDefault();
@@ -709,7 +693,6 @@
                 return true;
             });
 
-            // PURE JQUERY - Delete confirmation
             $('#deleteStaffForm').on('submit', function(e) {
                 if (!selectedStaffId) {
                     e.preventDefault();
