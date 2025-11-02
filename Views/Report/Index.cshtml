@@ -2,13 +2,6 @@
     ViewBag.Title = "Report - Bike Store Management";
 }
 
-<!-- Chart.js CDN -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-
-<!-- Summernote WYSIWYG Editor -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.js"></script>
-
 <style>
     .report-container {
         max-width: 1400px;
@@ -66,6 +59,13 @@
             background-color: #f9f9f9;
         }
 
+    .pdf-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    }
+
     .save-options {
         display: flex;
         gap: 15px;
@@ -114,6 +114,7 @@
     .archive-item-actions {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
     }
 
     .archive-item-description {
@@ -212,8 +213,16 @@
             </div>
         </div>
 
-        <!-- Save Options -->
+        <!-- PDF Actions using pdfMake -->
+        <div class="pdf-actions">
+            <button type="button" id="openPdfBtn" class="btn btn-info">Open PDF</button>
+            <button type="button" id="printPdfBtn" class="btn btn-warning">Print PDF</button>
+            <button type="button" id="downloadPdfBtn" class="btn btn-success">Download PDF</button>
+        </div>
+
+        <!-- Save Options (HTML/TXT) -->
         <div class="save-options">
+            <label><strong>Save as HTML/TXT:</strong></label>
             <label>Filename:</label>
             <input type="text" id="reportFileName" value="BikeStoreReport" class="form-control" style="width: 250px;">
 
@@ -237,9 +246,9 @@
     <div class="archive-section">
         <h3>Document Archive</h3>
         <div class="archive-list" id="archiveList">
-            @if (ViewBag.SavedFiles != null && ViewBag.SavedFiles.Count > 0)
+            @if (ViewBag.SavedFiles != null && ((List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles).Count > 0)
             {
-                foreach (var file in ViewBag.SavedFiles)
+                foreach (var file in (List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles)
                 {
                     <div class="archive-item">
                         <div class="archive-item-header">
@@ -266,6 +275,17 @@
 </div>
 
 @section Scripts {
+    <!-- Chart.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+
+    <!-- pdfMake CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
+    <!-- Summernote WYSIWYG Editor -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.js"></script>
+
     <script>
         // Get report data from server
         var reportData = @Html.Raw(ViewBag.ReportData ?? "[]");
@@ -276,14 +296,21 @@
 
             // Check if we have data
             if (!reportData || reportData.length === 0) {
-                alert("No report data available. Please ensure there are orders in the database.");
+                $('#reportContent').html('<div class="alert alert-warning">No report data available. Please ensure there are orders in the database with order items.</div>');
                 return;
             }
 
             // Initialize Summernote editor
             $('#descriptionEditor').summernote({
                 height: 200,
-                placeholder: 'Enter description...'
+                placeholder: 'Enter description for this report...',
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
             });
 
             // Set report date
@@ -338,7 +365,11 @@
                         datasets: [{
                             label: 'Number of Orders',
                             data: data,
-                            backgroundColor: colors
+                            backgroundColor: colors,
+                            borderColor: colors.map(function(color) {
+                                return color.replace('60%', '50%');
+                            }),
+                            borderWidth: 1
                         }]
                     },
                     options: {
@@ -347,29 +378,258 @@
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero: true
+                                    beginAtZero: true,
+                                    stepSize: 1
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Number of Orders'
+                                }
+                            }],
+                            xAxes: [{
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 45,
+                                    minRotation: 45
                                 }
                             }]
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top 10 Most Popular Products',
+                            fontSize: 16
                         }
                     }
                 });
             }
 
-            // Save Report
+            // Function to generate PDF Document Definition using pdfMake
+            function getPdfDocDef() {
+                // Prepare table body data
+                var tableBody = [
+                    // Header row
+                    [
+                        { text: 'Rank', style: 'tableHeader' },
+                        { text: 'Product Name', style: 'tableHeader' },
+                        { text: 'Brand', style: 'tableHeader' },
+                        { text: 'Category', style: 'tableHeader' },
+                        { text: 'Orders', style: 'tableHeader' }
+                    ]
+                ];
+
+                // Data rows
+                for (var i = 0; i < reportData.length; i++) {
+                    tableBody.push([
+                        (i + 1).toString(),
+                        reportData[i].Label,
+                        reportData[i].Brand,
+                        reportData[i].Category,
+                        reportData[i].Value.toString()
+                    ]);
+                }
+
+                // Get chart as base64 image
+                var chartImage = reportChart.toBase64Image();
+
+                // Document definition
+                var docDefinition = {
+                    content: [
+                        // Title
+                        { text: 'Bike Store Sales Report', style: 'header' },
+                        { text: 'Top 10 Most Popular Bicycle Products', style: 'subheader' },
+                        { text: 'Generated: ' + new Date().toLocaleString(), style: 'dateText' },
+                        { text: '\n' },
+
+                        // Summary Statistics
+                        {
+                            columns: [
+                                {
+                                    width: '50%',
+                                    text: [
+                                        { text: 'Total Orders (Top 10): ', bold: true },
+                                        totalOrders.toString()
+                                    ]
+                                },
+                                {
+                                    width: '50%',
+                                    text: [
+                                        { text: 'Avg Orders per Product: ', bold: true },
+                                        avgOrders
+                                    ]
+                                }
+                            ],
+                            style: 'stats'
+                        },
+                        { text: '\n' },
+
+                        // Chart
+                        {
+                            text: 'Product Orders Chart',
+                            style: 'chartTitle'
+                        },
+                        {
+                            image: chartImage,
+                            width: 500,
+                            height: 300,
+                            margin: [0, 10, 0, 20],
+                            alignment: 'center'
+                        },
+
+                        // Table
+                        {
+                            text: 'Detailed Product Statistics',
+                            style: 'tableTitle'
+                        },
+                        {
+                            table: {
+                                headerRows: 1,
+                                widths: [40, '*', 100, 100, 60],
+                                body: tableBody
+                            },
+                            layout: {
+                                fillColor: function (rowIndex, node, columnIndex) {
+                                    return (rowIndex === 0) ? '#007bff' : (rowIndex % 2 === 0) ? '#f9f9f9' : null;
+                                },
+                                hLineWidth: function (i, node) {
+                                    return 1;
+                                },
+                                vLineWidth: function (i, node) {
+                                    return 1;
+                                },
+                                hLineColor: function (i, node) {
+                                    return '#ddd';
+                                },
+                                vLineColor: function (i, node) {
+                                    return '#ddd';
+                                }
+                            }
+                        },
+                        { text: '\n' },
+                        {
+                            text: [
+                                { text: 'Report End\n', style: 'footer' },
+                                { text: 'Generated by Bike Store Management System', style: 'footerSmall' }
+                            ],
+                            alignment: 'center'
+                        }
+                    ],
+                    styles: {
+                        header: {
+                            fontSize: 22,
+                            bold: true,
+                            margin: [0, 0, 0, 10],
+                            alignment: 'center',
+                            color: '#007bff'
+                        },
+                        subheader: {
+                            fontSize: 16,
+                            bold: true,
+                            margin: [0, 0, 0, 5],
+                            alignment: 'center'
+                        },
+                        dateText: {
+                            fontSize: 10,
+                            italics: true,
+                            alignment: 'center',
+                            margin: [0, 0, 0, 10],
+                            color: '#666'
+                        },
+                        stats: {
+                            fontSize: 12,
+                            margin: [0, 10, 0, 10]
+                        },
+                        chartTitle: {
+                            fontSize: 14,
+                            bold: true,
+                            margin: [0, 10, 0, 5]
+                        },
+                        tableTitle: {
+                            fontSize: 14,
+                            bold: true,
+                            margin: [0, 10, 0, 10]
+                        },
+                        tableHeader: {
+                            bold: true,
+                            fontSize: 11,
+                            color: 'white'
+                        },
+                        footer: {
+                            fontSize: 12,
+                            italics: true,
+                            margin: [0, 10, 0, 5]
+                        },
+                        footerSmall: {
+                            fontSize: 10,
+                            color: '#666'
+                        }
+                    },
+                    pageOrientation: 'portrait',
+                    pageMargins: [40, 60, 40, 60]
+                };
+
+                return docDefinition;
+            }
+
+            // Open PDF in new window
+            $('#openPdfBtn').click(function () {
+                try {
+                    pdfMake.createPdf(getPdfDocDef()).open();
+                } catch (error) {
+                    console.error('Error opening PDF:', error);
+                    alert('Error opening PDF: ' + error.message);
+                }
+            });
+
+            // Print PDF
+            $('#printPdfBtn').click(function () {
+                try {
+                    pdfMake.createPdf(getPdfDocDef()).print();
+                } catch (error) {
+                    console.error('Error printing PDF:', error);
+                    alert('Error printing PDF: ' + error.message);
+                }
+            });
+
+            // Download PDF
+            $('#downloadPdfBtn').click(function () {
+                try {
+                    var fileName = $('#reportFileName').val().trim() || 'BikeStoreReport';
+                    pdfMake.createPdf(getPdfDocDef()).download(fileName + '.pdf');
+                } catch (error) {
+                    console.error('Error downloading PDF:', error);
+                    alert('Error downloading PDF: ' + error.message);
+                }
+            });
+
+            // Save Report (HTML/TXT - existing functionality)
             $('#saveReportBtn').click(function () {
                 var fileName = $('#reportFileName').val().trim() || 'Report';
                 var fileType = $('#reportFileType').val();
                 var description = $('#descriptionEditor').summernote('code');
 
                 // Build simple HTML report
-                var reportHtml = '<html><head><title>' + fileName + '</title>';
-                reportHtml += '<style>body{font-family:Arial;margin:20px;}table{width:100%;border-collapse:collapse;}';
-                reportHtml += 'th,td{border:1px solid #ddd;padding:8px;}th{background:#007bff;color:white;}</style>';
-                reportHtml += '</head><body>';
+                var reportHtml = '<!DOCTYPE html><html><head><title>' + fileName + '</title>';
+                reportHtml += '<meta charset="utf-8">';
+                reportHtml += '<style>body{font-family:Arial,sans-serif;margin:20px;line-height:1.6;}';
+                reportHtml += 'h1{color:#007bff;text-align:center;}';
+                reportHtml += 'table{width:100%;border-collapse:collapse;margin-top:20px;}';
+                reportHtml += 'th,td{border:1px solid #ddd;padding:10px;text-align:left;}';
+                reportHtml += 'th{background:#007bff;color:white;font-weight:bold;}';
+                reportHtml += 'tr:nth-child(even){background:#f9f9f9;}';
+                reportHtml += '.stats{background:#e9ecef;padding:15px;border-radius:5px;margin:20px 0;}';
+                reportHtml += '</style></head><body>';
                 reportHtml += '<h1>Bike Store Sales Report</h1>';
-                reportHtml += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
+                reportHtml += '<p style="text-align:center;color:#666;"><em>Generated: ' + new Date().toLocaleString() + '</em></p>';
+                reportHtml += '<div class="stats">';
+                reportHtml += '<p><strong>Total Orders (Top 10):</strong> ' + totalOrders + '</p>';
+                reportHtml += '<p><strong>Average Orders per Product:</strong> ' + avgOrders + '</p>';
+                reportHtml += '</div>';
                 reportHtml += '<h2>Top 10 Products</h2>';
-                reportHtml += '<table><tr><th>Rank</th><th>Product</th><th>Brand</th><th>Category</th><th>Orders</th></tr>';
+                reportHtml += '<table><thead><tr><th>Rank</th><th>Product</th><th>Brand</th><th>Category</th><th>Orders</th></tr></thead><tbody>';
 
                 for (var i = 0; i < reportData.length; i++) {
                     reportHtml += '<tr>';
@@ -381,7 +641,7 @@
                     reportHtml += '</tr>';
                 }
 
-                reportHtml += '</table></body></html>';
+                reportHtml += '</tbody></table></body></html>';
 
                 $.ajax({
                     url: '@Url.Action("SaveReport", "Report")',
@@ -425,7 +685,7 @@
                             if (data.success && data.description) {
                                 $descDiv.html(data.description).slideDown();
                             } else {
-                                $descDiv.html('<em>No description</em>').slideDown();
+                                $descDiv.html('<em>No description available</em>').slideDown();
                             }
                         },
                         error: function(xhr, status, error) {
@@ -445,7 +705,7 @@
             // Delete File
             $('.delete-file').click(function () {
                 var fileName = $(this).data('filename');
-                if (confirm('Delete this file?')) {
+                if (confirm('Are you sure you want to delete this file?')) {
                     $.ajax({
                         url: '@Url.Action("DeleteFile", "Report")',
                         type: 'POST',

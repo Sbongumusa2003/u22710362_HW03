@@ -16,12 +16,12 @@ namespace u22710362_HW03.Controllers
         private BikeStoresEntities db = new BikeStoresEntities();
 
         // GET: Report
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             try
             {
                 // Get report data - Popular Products Report
-                var popularProducts = await db.order_items
+                var popularProducts = db.order_items
                     .GroupBy(oi => oi.product_id)
                     .Select(g => new
                     {
@@ -30,15 +30,16 @@ namespace u22710362_HW03.Controllers
                     })
                     .OrderByDescending(x => x.TotalOrders)
                     .Take(10)
-                    .ToListAsync();
+                    .ToList();
 
                 var reportData = new List<ReportDataItem>();
+
                 foreach (var item in popularProducts)
                 {
-                    var product = await db.products
+                    var product = db.products
                         .Include(p => p.brands)
                         .Include(p => p.categories)
-                        .FirstOrDefaultAsync(p => p.product_id == item.ProductId);
+                        .FirstOrDefault(p => p.product_id == item.ProductId);
 
                     if (product != null)
                     {
@@ -46,16 +47,16 @@ namespace u22710362_HW03.Controllers
                         {
                             Label = product.product_name,
                             Value = item.TotalOrders,
-                            Brand = product.brands?.brand_name ?? "N/A",
-                            Category = product.categories?.category_name ?? "N/A"
+                            Brand = product.brands != null ? product.brands.brand_name : "N/A",
+                            Category = product.categories != null ? product.categories.category_name : "N/A"
                         });
                     }
                 }
 
                 ViewBag.ReportData = JsonConvert.SerializeObject(reportData);
-                ViewBag.TotalProducts = await db.products.CountAsync();
-                ViewBag.TotalOrders = await db.orders.CountAsync();
-                ViewBag.TotalCustomers = await db.customers.CountAsync();
+                ViewBag.TotalProducts = db.products.Count();
+                ViewBag.TotalOrders = db.orders.Count();
+                ViewBag.TotalCustomers = db.customers.Count();
 
                 // Get saved files from Reports folder
                 var filesPath = Server.MapPath("~/Reports");
@@ -132,7 +133,7 @@ namespace u22710362_HW03.Controllers
                     System.IO.File.WriteAllText(filePath, plainText);
                 }
 
-                // Save description if provided (bonus feature)
+                // Save description if provided
                 if (!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
                 {
                     var descriptionPath = Path.Combine(filesPath, fullFileName + ".description.txt");
