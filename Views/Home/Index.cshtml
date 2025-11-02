@@ -803,24 +803,24 @@
 
                 // Use proper URL path (remove ~/ and use relative or absolute path)
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('/Images/' + productId + ext);
+                    imagePaths.push('~/Images/' + productId + ext);
                 });
 
                 if (productName) {
                     var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('/Images/' + productNameClean + ext);
+                        imagePaths.push('~/Images/' + productNameClean + ext);
                     });
                 }
 
                 if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('~/Images/' + brandName.replace(/\s+/g, '_') + ext);
                     });
                 }
 
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('/Images/{productId}' + ext);
+                    imagePaths.push('~/Images/{productId}' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
