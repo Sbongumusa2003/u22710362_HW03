@@ -820,9 +820,9 @@
                 }
 
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('/Images/bicycle' + ext);
-                    imagePaths.push('/Images/bike' + ext);
-                    imagePaths.push('/Images/default' + ext);
+                    imagePaths.push('/Images/{productId}' + ext);
+                    imagePaths.push('/Images/{cleanProductName}' + ext);
+                    imagePaths.push('/Images/{brandName}' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
