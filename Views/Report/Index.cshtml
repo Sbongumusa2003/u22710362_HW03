@@ -555,8 +555,6 @@
 
                 return docDefinition;
             }
-
-            // PDF button handlers
             $('#openPdfBtn').on('click', function() {
                 try {
                     pdfMake.createPdf(getPdfDocDef()).open();
