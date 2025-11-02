@@ -620,38 +620,39 @@
                 });
             }
 
-            // PURE JQUERY - Load product image
+            // PURE JQUERY - Load product image (FIXED PATH)
             function loadProductImage(productId, brandName, productName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
+                // Use proper URL path (remove ~/ and use absolute path starting with /)
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('~/Content/Images/' + productId + ext);
+                    imagePaths.push('/Content/Images/' + productId + ext);
                 });
 
                 if (productName) {
                     var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Content/Images/' + productNameClean + ext);
+                        imagePaths.push('/Content/Images/' + productNameClean + ext);
                     });
                 }
 
                 if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
                     });
                 }
 
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('~/Content/Images/bicycle' + ext);
-                    imagePaths.push('~/Content/Images/bike' + ext);
-                    imagePaths.push('~/Content/Images/default' + ext);
+                    imagePaths.push('/Content/Images/bicycle' + ext);
+                    imagePaths.push('/Content/Images/bike' + ext);
+                    imagePaths.push('/Content/Images/default' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
             }
 
-            // PURE JQUERY - Try loading images
+            // PURE JQUERY - Try loading images recursively
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
                     $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
@@ -660,7 +661,16 @@
 
                 $('<img>')
                     .on('load', function() {
-                        $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" />');
+                        $('#productImageContainer').html(
+                            $('<img>')
+                                .attr('src', paths[index])
+                                .attr('alt', 'Product Image')
+                                .css({
+                                    'max-width': '100%',
+                                    'max-height': '100%',
+                                    'object-fit': 'contain'
+                                })
+                        );
                     })
                     .on('error', function() {
                         tryLoadImage(paths, index + 1);

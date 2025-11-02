@@ -791,41 +791,38 @@
                         $('#product_year').text(product.model_year);
                         $('#product_price').text('$' + product.list_price.toFixed(2));
 
-                        loadProductImage(product.product_id, product.brand_name);
+                        loadProductImage(product.product_id, product.brand_name, product.product_name);
                     }
                 });
             }
 
-            // PURE JQUERY - Load product image
-            function loadProductImage(productId, brandName) {
+            // PURE JQUERY - Load product image (FIXED PATH)
+            function loadProductImage(productId, brandName, productName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
+                // Use proper URL path (remove ~/ and use relative or absolute path)
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('~/Content/Images/' + productId + ext);
+                    imagePaths.push('Images/' + productId + ext);
                 });
 
-                var product = $.grep(filteredProductData, function(p) {
-                    return p.product_id === productId;
-                })[0];
-
-                if (product && product.product_name) {
-                    var productNameClean = product.product_name.replace(/[^a-zA-Z0-9]/g, '_');
+                if (productName) {
+                    var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Content/Images/' + productNameClean + ext);
+                        imagePaths.push('/Images/' + productNameClean + ext);
                     });
                 }
 
-                if (brandName) {
+                if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
                     });
                 }
 
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('~/Content/Images/bicycle' + ext);
-                    imagePaths.push('~/Content/Images/bike' + ext);
-                    imagePaths.push('~/Content/Images/default' + ext);
+                    imagePaths.push('/Images/bicycle' + ext);
+                    imagePaths.push('/Images/bike' + ext);
+                    imagePaths.push('/Images/default' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
