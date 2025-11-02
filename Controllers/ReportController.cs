@@ -62,7 +62,7 @@ namespace u22710362_HW03.Controllers
                 var filesPath = Server.MapPath("~/Reports");
                 if (!Directory.Exists(filesPath))
                 {
-                    Directory.CreateDirectory();
+                    Directory.CreateDirectory(filesPath); // FIXED: Added the path parameter
                 }
 
                 var files = Directory.GetFiles(filesPath)
@@ -91,7 +91,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Report/SaveReport - FIXED: Returns redirect instead of JSON
+        // POST: Report/SaveReport - Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult SaveReport(string fileName, string fileType, string reportHtml, string description)
@@ -174,7 +174,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Report/DeleteFile - FIXED: Returns redirect instead of JSON
+        // POST: Report/DeleteFile - Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteFile(string fileName)
@@ -209,7 +209,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
         // GET: Report/GetFileDescription
         [HttpGet]
         public ActionResult GetFileDescription(string fileName)

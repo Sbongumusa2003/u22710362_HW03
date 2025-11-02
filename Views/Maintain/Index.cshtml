@@ -107,6 +107,7 @@
         display: flex;
         gap: 10px;
         margin-top: 15px;
+        flex-wrap: wrap;
     }
 
     .product-details {
@@ -228,15 +229,18 @@
                 <div class="pagination" id="staffPagination"></div>
 
                 <div class="action-buttons">
-                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="glyphicon glyphicon-floppy-disk"></i> Update
+                    </button>
+                    @using (Html.BeginForm("DeleteStaff", "Maintain", FormMethod.Post, new { id = "deleteStaffForm", style = "display:inline;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="delete_staff_id" />
+                        <button type="submit" class="btn btn-sm btn-danger" id="deleteStaffBtn">
+                            <i class="glyphicon glyphicon-trash"></i> Delete
+                        </button>
+                    }
                 </div>
-            }
-
-            @using (Html.BeginForm("DeleteStaff", "Maintain", FormMethod.Post, new { id = "deleteStaffForm", style = "display:inline;" }))
-            {
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" id="delete_staff_id" />
-                <button type="submit" class="btn btn-sm btn-danger" id="deleteStaffBtn">Delete</button>
             }
         </div>
 
@@ -284,15 +288,18 @@
                 <div class="pagination" id="customerPagination"></div>
 
                 <div class="action-buttons">
-                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="glyphicon glyphicon-floppy-disk"></i> Update
+                    </button>
+                    @using (Html.BeginForm("DeleteCustomer", "Maintain", FormMethod.Post, new { id = "deleteCustomerForm", style = "display:inline;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="delete_customer_id" />
+                        <button type="submit" class="btn btn-sm btn-danger" id="deleteCustomerBtn">
+                            <i class="glyphicon glyphicon-trash"></i> Delete
+                        </button>
+                    }
                 </div>
-            }
-
-            @using (Html.BeginForm("DeleteCustomer", "Maintain", FormMethod.Post, new { id = "deleteCustomerForm", style = "display:inline;" }))
-            {
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" id="delete_customer_id" />
-                <button type="submit" class="btn btn-sm btn-danger" id="deleteCustomerBtn">Delete</button>
             }
         </div>
 
@@ -353,15 +360,18 @@
                 <div class="pagination" id="productPagination"></div>
 
                 <div class="action-buttons">
-                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="glyphicon glyphicon-floppy-disk"></i> Update
+                    </button>
+                    @using (Html.BeginForm("DeleteProduct", "Maintain", FormMethod.Post, new { id = "deleteProductForm", style = "display:inline;" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" id="delete_product_id" />
+                        <button type="submit" class="btn btn-sm btn-danger" id="deleteProductBtn">
+                            <i class="glyphicon glyphicon-trash"></i> Delete
+                        </button>
+                    }
                 </div>
-            }
-
-            @using (Html.BeginForm("DeleteProduct", "Maintain", FormMethod.Post, new { id = "deleteProductForm", style = "display:inline;" }))
-            {
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" id="delete_product_id" />
-                <button type="submit" class="btn btn-sm btn-danger" id="deleteProductBtn">Delete</button>
             }
         </div>
     </div>
@@ -629,10 +639,6 @@
                         imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
                     });
                 }
-
-                $.each(extensions, function(index, ext) {
-                    imagePaths.push('/Images/{productId}' + ext);
-                });
 
                 tryLoadImage(imagePaths, 0);
             }

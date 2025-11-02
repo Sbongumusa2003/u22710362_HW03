@@ -30,7 +30,8 @@
         padding: 20px;
         background-color: white;
         position: relative;
-        height: 450px;
+        height: 500px;
+        width: 100%;
     }
 
     .data-table {
@@ -61,9 +62,10 @@
 
     .pdf-actions {
         display: flex;
-        gap: 15px;
+        gap: 10px;
         margin-top: 15px;
         flex-wrap: wrap;
+        align-items: center;
     }
 
     .save-options {
@@ -158,6 +160,13 @@
     .stat-label {
         font-size: 14px;
     }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
 </style>
 
 <div class="report-container">
@@ -174,6 +183,13 @@
     {
         <div class="alert alert-success">
             @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
         </div>
     }
 
@@ -220,77 +236,18 @@
             </div>
         </div>
 
-        <!-- PDF Actions using pdfMake -->
+        <!-- PDF Actions - Buttons in a row -->
         <div class="pdf-actions">
-            <button type="button" id="openPdfBtn" class="btn btn-info">Open PDF</button>
-            <button type="button" id="printPdfBtn" class="btn btn-warning">Print PDF</button>
-            <button type="button" id="downloadPdfBtn" class="btn btn-success">Download PDF</button>
+            <button type="button" id="openPdfBtn" class="btn btn-info">
+                <i class="glyphicon glyphicon-eye-open"></i> Open PDF
+            </button>
+            <button type="button" id="printPdfBtn" class="btn btn-warning">
+                <i class="glyphicon glyphicon-print"></i> Print PDF
+            </button>
+            <button type="button" id="downloadPdfBtn" class="btn btn-success">
+                <i class="glyphicon glyphicon-download"></i> Download PDF
+            </button>
         </div>
-
-        <!-- Save Options (HTML/TXT) - NO AJAX, uses traditional form POST -->
-        @using (Html.BeginForm("SaveReport", "Report", FormMethod.Post, new { id = "saveReportForm" }))
-        {
-            <input type="hidden" name="reportHtml" id="reportHtmlInput" />
-            <input type="hidden" name="description" id="descriptionInput" />
-
-            <div class="save-options">
-                <label><strong>Save as HTML/TXT:</strong></label>
-                <label>Filename:</label>
-                <input type="text" name="fileName" id="reportFileName" value="BikeStoreReport" class="form-control" style="width: 250px;">
-
-                <label>File Type:</label>
-                <select name="fileType" id="reportFileType" class="form-control" style="width: 150px;">
-                    <option value="html">HTML</option>
-                    <option value="txt">Text</option>
-                </select>
-
-                <button type="submit" class="btn btn-primary">Save Report</button>
-            </div>
-        }
-
-        <!-- Description Editor -->
-        <div class="description-editor">
-            <h5>Add Description (Optional - Bonus Feature)</h5>
-            <div id="descriptionEditor"></div>
-        </div>
-    </div>
-
-    <!-- Document Archive Section -->
-    <div class="archive-section">
-        <h3>Document Archive</h3>
-        <div class="archive-list" id="archiveList">
-            @if (ViewBag.SavedFiles != null && ((List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles).Count > 0)
-            {
-                foreach (var file in (List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles)
-                {
-                    <div class="archive-item">
-                        <div class="archive-item-header">
-                            <div>
-                                <strong>@file.FileName</strong><br />
-                                <small>Size: @((file.FileSize / 1024.0).ToString("F2")) KB | Created: @file.CreatedDate.ToString("yyyy-MM-dd HH:mm")</small>
-                            </div>
-                            <div class="archive-item-actions">
-                                <button class="btn btn-sm btn-info view-description" data-filename="@file.FileName">View Description</button>
-                                <a href="@Url.Action("DownloadFile", "Report", new { fileName = file.FileName })" class="btn btn-sm btn-success">Download</a>
-
-                                @using (Html.BeginForm("DeleteFile", "Report", FormMethod.Post, new { style = "display:inline;" }))
-                                {
-                                    <input type="hidden" name="fileName" value="@file.FileName" />
-                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this file?');">Delete</button>
-                                }
-                            </div>
-                        </div>
-                        <div class="archive-item-description" data-filename="@file.FileName"></div>
-                    </div>
-                }
-            }
-            else
-            {
-                <p style="text-align: center; padding: 40px; color: #999;">No saved reports</p>
-            }
-        </div>
-    </div>
-</div>
 
 @section Scripts {
     <!-- Chart.js CDN -->
@@ -305,11 +262,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.js"></script>
 
     <script>
-        // NO AJAX - Get report data from server (embedded at page load)
         var reportData = @Html.Raw(ViewBag.ReportData ?? "[]");
         var reportChart = null;
 
-        // NO AJAX - Get file descriptions embedded at page load
         var fileDescriptions = {
             @if (ViewBag.SavedFiles != null)
             {
@@ -328,23 +283,31 @@
 
             if (!reportData || reportData.length === 0) {
                 $('#reportContent').html('<div class="alert alert-warning">No report data available. Please ensure there are orders in the database with order items.</div>');
+                $('.pdf-actions, .save-options, .description-editor').hide();
                 return;
             }
 
-            // PURE JQUERY - Initialize Summernote editor
-            $('#descriptionEditor').summernote({
-                height: 200,
-                placeholder: 'Enter description for this report...',
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['font', ['strikethrough', 'superscript', 'subscript']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ]
-            });
+            // Initialize Summernote editor
+            try {
+                $('#descriptionEditor').summernote({
+                    height: 200,
+                    placeholder: 'Enter description for this report...',
+                    toolbar: [
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['insert', ['link']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+                console.log('Summernote initialized successfully');
+            } catch (error) {
+                console.error('Error initializing Summernote:', error);
+                // Fallback to textarea if Summernote fails
+                $('#descriptionEditor').html('<textarea id="descriptionTextarea" class="form-control" rows="5" placeholder="Enter description for this report..."></textarea>');
+            }
 
-            // PURE JQUERY - Set report date
+            // Set report date
             $('#reportDate').text(new Date().toLocaleString());
 
             // Calculate statistics
@@ -357,7 +320,7 @@
             $('#totalOrdersValue').text(totalOrders);
             $('#avgOrdersValue').text(avgOrders);
 
-            // PURE JQUERY - Populate table
+            // Populate table
             var $tableBody = $('#reportTableBody');
             $tableBody.empty();
 
@@ -371,7 +334,7 @@
                 $tableBody.append($row);
             });
 
-            // PURE JQUERY - Create Chart (Chart.js with jQuery selectors)
+            // Create Chart
             var ctx = $('#reportChart');
             if (ctx.length > 0) {
                 ctx = ctx[0].getContext('2d');
@@ -398,45 +361,71 @@
                             borderColor: $.map(colors, function(color) {
                                 return color.replace('60%', '50%');
                             }),
-                            borderWidth: 1
+                            borderWidth: 2
                         }]
                     },
                     options: {
                         responsive: true,
-                        maintainAspectRatio: false,
+                        maintainAspectRatio: true,
+                        aspectRatio: 2,
                         scales: {
                             yAxes: [{
                                 ticks: {
                                     beginAtZero: true,
-                                    stepSize: 1
+                                    stepSize: 1,
+                                    fontSize: 12
                                 },
                                 scaleLabel: {
                                     display: true,
-                                    labelString: 'Number of Orders'
+                                    labelString: 'Number of Orders',
+                                    fontSize: 14,
+                                    fontStyle: 'bold'
+                                },
+                                gridLines: {
+                                    display: true,
+                                    color: 'rgba(0,0,0,0.1)'
                                 }
                             }],
                             xAxes: [{
                                 ticks: {
                                     autoSkip: false,
                                     maxRotation: 45,
-                                    minRotation: 45
+                                    minRotation: 45,
+                                    fontSize: 11
+                                },
+                                gridLines: {
+                                    display: false
                                 }
                             }]
                         },
                         legend: {
                             display: true,
-                            position: 'top'
+                            position: 'top',
+                            labels: {
+                                fontSize: 13
+                            }
                         },
                         title: {
                             display: true,
                             text: 'Top 10 Most Popular Products',
-                            fontSize: 16
+                            fontSize: 18,
+                            fontStyle: 'bold'
+                        },
+                        tooltips: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(tooltipItem, data) {
+                                    return 'Orders: ' + tooltipItem.yLabel;
+                                }
+                            }
                         }
                     }
                 });
             }
 
-            // Function to generate PDF Document Definition
+            // PDF Functions
             function getPdfDocDef() {
                 var tableBody = [
                     [
@@ -583,7 +572,7 @@
                 return docDefinition;
             }
 
-            // PURE JQUERY - Open PDF (no AJAX)
+            // PDF button handlers
             $('#openPdfBtn').on('click', function() {
                 try {
                     pdfMake.createPdf(getPdfDocDef()).open();
@@ -593,7 +582,6 @@
                 }
             });
 
-            // PURE JQUERY - Print PDF (no AJAX)
             $('#printPdfBtn').on('click', function() {
                 try {
                     pdfMake.createPdf(getPdfDocDef()).print();
@@ -603,7 +591,6 @@
                 }
             });
 
-            // PURE JQUERY - Download PDF (no AJAX)
             $('#downloadPdfBtn').on('click', function() {
                 try {
                     var fileName = $.trim($('#reportFileName').val()) || 'BikeStoreReport';
@@ -614,52 +601,69 @@
                 }
             });
 
-            // PURE JQUERY - Save Report form submission (NO AJAX - traditional POST)
+            // Save Report form submission
             $('#saveReportForm').on('submit', function(e) {
-                var fileName = $.trim($('#reportFileName').val()) || 'Report';
-                var description = $('#descriptionEditor').summernote('code');
+                try {
+                    var fileName = $.trim($('#reportFileName').val());
+                    if (!fileName) {
+                        fileName = 'Report';
+                    }
 
-                // Build simple HTML report
-                var reportHtml = '<!DOCTYPE html><html><head><title>' + fileName + '</title>';
-                reportHtml += '<meta charset="utf-8">';
-                reportHtml += '<style>body{font-family:Arial,sans-serif;margin:20px;line-height:1.6;}';
-                reportHtml += 'h1{color:#007bff;text-align:center;}';
-                reportHtml += 'table{width:100%;border-collapse:collapse;margin-top:20px;}';
-                reportHtml += 'th,td{border:1px solid #ddd;padding:10px;text-align:left;}';
-                reportHtml += 'th{background:#007bff;color:white;font-weight:bold;}';
-                reportHtml += 'tr:nth-child(even){background:#f9f9f9;}';
-                reportHtml += '.stats{background:#e9ecef;padding:15px;border-radius:5px;margin:20px 0;}';
-                reportHtml += '</style></head><body>';
-                reportHtml += '<h1>Bike Store Sales Report</h1>';
-                reportHtml += '<p style="text-align:center;color:#666;"><em>Generated: ' + new Date().toLocaleString() + '</em></p>';
-                reportHtml += '<div class="stats">';
-                reportHtml += '<p><strong>Total Orders (Top 10):</strong> ' + totalOrders + '</p>';
-                reportHtml += '<p><strong>Average Orders per Product:</strong> ' + avgOrders + '</p>';
-                reportHtml += '</div>';
-                reportHtml += '<h2>Top 10 Products</h2>';
-                reportHtml += '<table><thead><tr><th>Rank</th><th>Product</th><th>Brand</th><th>Category</th><th>Orders</th></tr></thead><tbody>';
+                    var description = $('#descriptionEditor').summernote('code');
 
-                $.each(reportData, function(index, item) {
-                    reportHtml += '<tr>';
-                    reportHtml += '<td>' + (index + 1) + '</td>';
-                    reportHtml += '<td>' + item.Label + '</td>';
-                    reportHtml += '<td>' + item.Brand + '</td>';
-                    reportHtml += '<td>' + item.Category + '</td>';
-                    reportHtml += '<td>' + item.Value + '</td>';
-                    reportHtml += '</tr>';
-                });
+                    // Build HTML report
+                    var reportHtml = '<!DOCTYPE html><html><head><title>' + fileName + '</title>';
+                    reportHtml += '<meta charset="utf-8">';
+                    reportHtml += '<style>body{font-family:Arial,sans-serif;margin:20px;line-height:1.6;}';
+                    reportHtml += 'h1{color:#007bff;text-align:center;}';
+                    reportHtml += 'table{width:100%;border-collapse:collapse;margin-top:20px;}';
+                    reportHtml += 'th,td{border:1px solid #ddd;padding:10px;text-align:left;}';
+                    reportHtml += 'th{background:#007bff;color:white;font-weight:bold;}';
+                    reportHtml += 'tr:nth-child(even){background:#f9f9f9;}';
+                    reportHtml += '.stats{background:#e9ecef;padding:15px;border-radius:5px;margin:20px 0;}';
+                    reportHtml += '</style></head><body>';
+                    reportHtml += '<h1>Bike Store Sales Report</h1>';
+                    reportHtml += '<p style="text-align:center;color:#666;"><em>Generated: ' + new Date().toLocaleString() + '</em></p>';
+                    reportHtml += '<div class="stats">';
+                    reportHtml += '<p><strong>Total Orders (Top 10):</strong> ' + totalOrders + '</p>';
+                    reportHtml += '<p><strong>Average Orders per Product:</strong> ' + avgOrders + '</p>';
+                    reportHtml += '</div>';
+                    reportHtml += '<h2>Top 10 Products</h2>';
+                    reportHtml += '<table><thead><tr><th>Rank</th><th>Product</th><th>Brand</th><th>Category</th><th>Orders</th></tr></thead><tbody>';
 
-                reportHtml += '</tbody></table></body></html>';
+                    $.each(reportData, function(index, item) {
+                        reportHtml += '<tr>';
+                        reportHtml += '<td>' + (index + 1) + '</td>';
+                        reportHtml += '<td>' + item.Label + '</td>';
+                        reportHtml += '<td>' + item.Brand + '</td>';
+                        reportHtml += '<td>' + item.Category + '</td>';
+                        reportHtml += '<td>' + item.Value + '</td>';
+                        reportHtml += '</tr>';
+                    });
 
-                // Set hidden inputs for form POST
-                $('#reportHtmlInput').val(reportHtml);
-                $('#descriptionInput').val(description);
+                    reportHtml += '</tbody></table></body></html>';
 
-                // Form submits normally - NO AJAX
-                return true;
+                    // Set the hidden input values
+                    $('#reportHtmlInput').val(reportHtml);
+                    $('#descriptionInput').val(description);
+
+                    console.log('Form submitting with:', {
+                        fileName: fileName,
+                        fileType: $('#reportFileType').val(),
+                        htmlLength: reportHtml.length,
+                        descLength: description.length
+                    });
+
+                    // Allow form to submit
+                    return true;
+                } catch (error) {
+                    console.error('Error preparing report:', error);
+                    alert('Error preparing report: ' + error.message);
+                    return false;
+                }
             });
 
-            // PURE JQUERY - View Description (NO AJAX - data preloaded)
+            // View Description
             $(document).on('click', '.view-description', function() {
                 var fileName = $(this).data('filename');
                 var $item = $(this).closest('.archive-item');
@@ -668,7 +672,6 @@
                 if ($descDiv.is(':visible')) {
                     $descDiv.slideUp();
                 } else {
-                    // Get description from preloaded data (NO AJAX)
                     var description = fileDescriptions[fileName] || '';
 
                     if (description && description.trim() !== '') {
