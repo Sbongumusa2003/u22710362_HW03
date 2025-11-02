@@ -179,18 +179,18 @@
                 <h4>Staff Management</h4>
             </div>
 
-            @using (Html.BeginForm("EditStaff", "Maintain", FormMethod.Post, new { id = "staffForm" }))
+            @using (Html.BeginForm("EditStaff", "Maintain", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="staff_id" id="maintain_staff_id_hidden" />
 
                 <div class="form-row">
                     <label>First Name</label>
-                    <input type="text" class="form-control form-control-sm" name="first_name" id="maintain_staff_first_name">
+                    <input type="text" class="form-control form-control-sm" name="first_name" id="maintain_staff_first_name" required>
                 </div>
                 <div class="form-row">
                     <label>Last Name</label>
-                    <input type="text" class="form-control form-control-sm" name="last_name" id="maintain_staff_last_name">
+                    <input type="text" class="form-control form-control-sm" name="last_name" id="maintain_staff_last_name" required>
                 </div>
                 <div class="form-row">
                     <label>Staff ID</label>
@@ -198,7 +198,7 @@
                 </div>
                 <div class="form-row">
                     <label>Email</label>
-                    <input type="text" class="form-control form-control-sm" name="email" id="maintain_staff_email">
+                    <input type="email" class="form-control form-control-sm" name="email" id="maintain_staff_email" required>
                 </div>
                 <div class="form-row">
                     <label>Phone</label>
@@ -206,17 +206,27 @@
                 </div>
                 <div class="form-row">
                     <label>Active</label>
-                    <select class="form-select form-select-sm" name="active" id="maintain_staff_active">
+                    <select class="form-select form-select-sm" name="active" id="maintain_staff_active" required>
                         <option value="1">Yes</option>
                         <option value="0">No</option>
                     </select>
                 </div>
                 <div class="form-row">
                     <label>Store</label>
-                    <select class="form-select form-select-sm" name="store_id" id="maintain_staff_store">
+                    <select class="form-select form-select-sm" name="store_id" id="maintain_staff_store" required>
                         @foreach (var store in ViewBag.Stores)
                         {
                             <option value="@store.store_id">@store.store_name</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-row">
+                    <label>Manager</label>
+                    <select class="form-select form-select-sm" name="manager_id" id="maintain_staff_manager">
+                        <option value="">No Manager</option>
+                        @foreach (var mgr in ViewBag.Managers)
+                        {
+                            <option value="@mgr.staff_id">@mgr.first_name @mgr.last_name</option>
                         }
                     </select>
                 </div>
@@ -232,15 +242,16 @@
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="glyphicon glyphicon-floppy-disk"></i> Update
                     </button>
-                    @using (Html.BeginForm("DeleteStaff", "Maintain", FormMethod.Post, new { id = "deleteStaffForm", style = "display:inline;" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" id="delete_staff_id" />
-                        <button type="submit" class="btn btn-sm btn-danger" id="deleteStaffBtn">
-                            <i class="glyphicon glyphicon-trash"></i> Delete
-                        </button>
-                    }
+                    <button type="button" class="btn btn-sm btn-danger" id="deleteStaffBtn">
+                        <i class="glyphicon glyphicon-trash"></i> Delete
+                    </button>
                 </div>
+            }
+
+            @using (Html.BeginForm("DeleteStaff", "Maintain", FormMethod.Post, new { id = "deleteStaffForm", style = "display:none;" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="delete_staff_id" />
             }
         </div>
 
@@ -250,18 +261,18 @@
                 <h4>Customer Management</h4>
             </div>
 
-            @using (Html.BeginForm("EditCustomer", "Maintain", FormMethod.Post, new { id = "customerForm" }))
+            @using (Html.BeginForm("EditCustomer", "Maintain", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="customer_id" id="maintain_customer_id_hidden" />
 
                 <div class="form-row">
                     <label>First Name</label>
-                    <input type="text" class="form-control form-control-sm" name="first_name" id="maintain_customer_first_name">
+                    <input type="text" class="form-control form-control-sm" name="first_name" id="maintain_customer_first_name" required>
                 </div>
                 <div class="form-row">
                     <label>Last Name</label>
-                    <input type="text" class="form-control form-control-sm" name="last_name" id="maintain_customer_last_name">
+                    <input type="text" class="form-control form-control-sm" name="last_name" id="maintain_customer_last_name" required>
                 </div>
                 <div class="form-row">
                     <label>Customer ID</label>
@@ -269,15 +280,27 @@
                 </div>
                 <div class="form-row">
                     <label>Email</label>
-                    <input type="text" class="form-control form-control-sm" name="email" id="maintain_customer_email">
+                    <input type="email" class="form-control form-control-sm" name="email" id="maintain_customer_email" required>
                 </div>
                 <div class="form-row">
                     <label>Phone</label>
                     <input type="text" class="form-control form-control-sm" name="phone" id="maintain_customer_phone">
                 </div>
                 <div class="form-row">
+                    <label>Street</label>
+                    <input type="text" class="form-control form-control-sm" name="street" id="maintain_customer_street">
+                </div>
+                <div class="form-row">
                     <label>City</label>
                     <input type="text" class="form-control form-control-sm" name="city" id="maintain_customer_city">
+                </div>
+                <div class="form-row">
+                    <label>State</label>
+                    <input type="text" class="form-control form-control-sm" name="state" id="maintain_customer_state">
+                </div>
+                <div class="form-row">
+                    <label>Zip Code</label>
+                    <input type="text" class="form-control form-control-sm" name="zip_code" id="maintain_customer_zip" maxlength="5">
                 </div>
 
                 <div class="list-box">
@@ -291,15 +314,16 @@
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="glyphicon glyphicon-floppy-disk"></i> Update
                     </button>
-                    @using (Html.BeginForm("DeleteCustomer", "Maintain", FormMethod.Post, new { id = "deleteCustomerForm", style = "display:inline;" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" id="delete_customer_id" />
-                        <button type="submit" class="btn btn-sm btn-danger" id="deleteCustomerBtn">
-                            <i class="glyphicon glyphicon-trash"></i> Delete
-                        </button>
-                    }
+                    <button type="button" class="btn btn-sm btn-danger" id="deleteCustomerBtn">
+                        <i class="glyphicon glyphicon-trash"></i> Delete
+                    </button>
                 </div>
+            }
+
+            @using (Html.BeginForm("DeleteCustomer", "Maintain", FormMethod.Post, new { id = "deleteCustomerForm", style = "display:none;" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="delete_customer_id" />
             }
         </div>
 
@@ -309,7 +333,7 @@
                 <h4>Product Management</h4>
             </div>
 
-            @using (Html.BeginForm("EditProduct", "Maintain", FormMethod.Post, new { id = "productForm" }))
+            @using (Html.BeginForm("EditProduct", "Maintain", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="product_id" id="maintain_product_id_hidden" />
@@ -318,19 +342,19 @@
                     <div class="product-form">
                         <div class="form-row">
                             <label>Product Name</label>
-                            <input type="text" class="form-control form-control-sm" name="product_name" id="maintain_product_name">
+                            <input type="text" class="form-control form-control-sm" name="product_name" id="maintain_product_name" required>
                         </div>
                         <div class="form-row">
                             <label>Model Year</label>
-                            <input type="number" class="form-control form-control-sm" name="model_year" id="maintain_product_year">
+                            <input type="number" class="form-control form-control-sm" name="model_year" id="maintain_product_year" required>
                         </div>
                         <div class="form-row">
                             <label>Price</label>
-                            <input type="number" step="0.01" class="form-control form-control-sm" name="list_price" id="maintain_product_price">
+                            <input type="number" step="0.01" class="form-control form-control-sm" name="list_price" id="maintain_product_price" required>
                         </div>
                         <div class="form-row">
                             <label>Brand</label>
-                            <select class="form-select form-select-sm" name="brand_id" id="maintain_product_brand">
+                            <select class="form-select form-select-sm" name="brand_id" id="maintain_product_brand" required>
                                 @foreach (var brand in ViewBag.Brands)
                                 {
                                     <option value="@brand.brand_id">@brand.brand_name</option>
@@ -339,7 +363,7 @@
                         </div>
                         <div class="form-row">
                             <label>Category</label>
-                            <select class="form-select form-select-sm" name="category_id" id="maintain_product_category">
+                            <select class="form-select form-select-sm" name="category_id" id="maintain_product_category" required>
                                 @foreach (var category in ViewBag.Categories)
                                 {
                                     <option value="@category.category_id">@category.category_name</option>
@@ -363,15 +387,16 @@
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="glyphicon glyphicon-floppy-disk"></i> Update
                     </button>
-                    @using (Html.BeginForm("DeleteProduct", "Maintain", FormMethod.Post, new { id = "deleteProductForm", style = "display:inline;" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" id="delete_product_id" />
-                        <button type="submit" class="btn btn-sm btn-danger" id="deleteProductBtn">
-                            <i class="glyphicon glyphicon-trash"></i> Delete
-                        </button>
-                    }
+                    <button type="button" class="btn btn-sm btn-danger" id="deleteProductBtn">
+                        <i class="glyphicon glyphicon-trash"></i> Delete
+                    </button>
                 </div>
+            }
+
+            @using (Html.BeginForm("DeleteProduct", "Maintain", FormMethod.Post, new { id = "deleteProductForm", style = "display:none;" }))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" id="delete_product_id" />
             }
         </div>
     </div>
@@ -437,17 +462,8 @@
 
                 if (totalPages <= 1) return;
 
-                $pagination.append(
-                    $('<button>&lt;&lt;</button>')
-                        .prop('disabled', currentPage === 1)
-                        .on('click', function() { if (currentPage !== 1) onPageChange(1); })
-                );
-
-                $pagination.append(
-                    $('<button>&lt;</button>')
-                        .prop('disabled', currentPage === 1)
-                        .on('click', function() { if (currentPage > 1) onPageChange(currentPage - 1); })
-                );
+                $pagination.append($('<button>&lt;&lt;</button>').prop('disabled', currentPage === 1).on('click', function() { if (currentPage !== 1) onPageChange(1); }));
+                $pagination.append($('<button>&lt;</button>').prop('disabled', currentPage === 1).on('click', function() { if (currentPage > 1) onPageChange(currentPage - 1); }));
 
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, currentPage + 2);
@@ -469,17 +485,8 @@
                     $pagination.append($('<button>' + totalPages + '</button>').on('click', function() { onPageChange(totalPages); }));
                 }
 
-                $pagination.append(
-                    $('<button>&gt;</button>')
-                        .prop('disabled', currentPage === totalPages)
-                        .on('click', function() { if (currentPage < totalPages) onPageChange(currentPage + 1); })
-                );
-
-                $pagination.append(
-                    $('<button>&gt;&gt;</button>')
-                        .prop('disabled', currentPage === totalPages)
-                        .on('click', function() { if (currentPage !== totalPages) onPageChange(totalPages); })
-                );
+                $pagination.append($('<button>&gt;</button>').prop('disabled', currentPage === totalPages).on('click', function() { if (currentPage < totalPages) onPageChange(currentPage + 1); }));
+                $pagination.append($('<button>&gt;&gt;</button>').prop('disabled', currentPage === totalPages).on('click', function() { if (currentPage !== totalPages) onPageChange(totalPages); }));
             }
 
             function displayStaffList(page) {
@@ -494,8 +501,8 @@
                 $.each(pageData, function(index, staff) {
                     var $li = $('<li class="staff-item"></li>')
                         .attr('data-id', staff.staff_id)
-                        .text(staff.first_name + ' ' + staff.last_name + ' - ' +
-                              (staff.stores ? staff.stores.store_name : 'N/A'));
+                        .text(staff.first_name + ' ' + staff.last_name + ' - ' + (staff.stores ? staff.stores.store_name : 'N/A'));
+                    if (staff.staff_id === selectedStaffId) $li.addClass('selected');
                     $list.append($li);
                 });
 
@@ -518,6 +525,7 @@
                     var $li = $('<li class="customer-item"></li>')
                         .attr('data-id', customer.customer_id)
                         .text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
+                    if (customer.customer_id === selectedCustomerId) $li.addClass('selected');
                     $list.append($li);
                 });
 
@@ -542,6 +550,7 @@
                         .attr('data-product-name', product.product_name)
                         .attr('data-brand-name', product.brand_name)
                         .text(product.product_name + ' - $' + product.list_price.toFixed(2));
+                    if (product.product_id === selectedProductId) $li.addClass('selected');
                     $list.append($li);
                 });
 
@@ -568,6 +577,7 @@
                         $('#maintain_staff_phone').val(staff.phone || '');
                         $('#maintain_staff_active').val(staff.active);
                         $('#maintain_staff_store').val(staff.store_id);
+                        $('#maintain_staff_manager').val(staff.manager_id || '');
                         $('#delete_staff_id').val(staff.staff_id);
                     }
                 });
@@ -588,7 +598,10 @@
                         $('#maintain_customer_id_hidden').val(customer.customer_id);
                         $('#maintain_customer_email').val(customer.email);
                         $('#maintain_customer_phone').val(customer.phone || '');
+                        $('#maintain_customer_street').val(customer.street || '');
                         $('#maintain_customer_city').val(customer.city || '');
+                        $('#maintain_customer_state').val(customer.state || '');
+                        $('#maintain_customer_zip').val(customer.zip_code || '');
                         $('#delete_customer_id').val(customer.customer_id);
                     }
                 });
@@ -627,13 +640,6 @@
                     imagePaths.push('/Images/' + productId + ext);
                 });
 
-                if (productName) {
-                    var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
-                    $.each(extensions, function(index, ext) {
-                        imagePaths.push('/Images/' + productNameClean + ext);
-                    });
-                }
-
                 if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
                         imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
@@ -651,16 +657,7 @@
 
                 $('<img>')
                     .on('load', function() {
-                        $('#productImageContainer').html(
-                            $('<img>')
-                                .attr('src', paths[index])
-                                .attr('alt', 'Product Image')
-                                .css({
-                                    'max-width': '100%',
-                                    'max-height': '100%',
-                                    'object-fit': 'contain'
-                                })
-                        );
+                        $('#productImageContainer').html($('<img>').attr('src', paths[index]).attr('alt', 'Product Image'));
                     })
                     .on('error', function() {
                         tryLoadImage(paths, index + 1);
@@ -672,70 +669,38 @@
             displayCustomerList(1);
             displayProductList(1);
 
-            $('#staffForm').on('submit', function(e) {
+            // Delete button handlers
+            $('#deleteStaffBtn').on('click', function(e) {
+                e.preventDefault();
                 if (!selectedStaffId) {
-                    e.preventDefault();
                     alert('Please select a staff member first');
                     return false;
                 }
-                return true;
+                if (confirm('Are you sure you want to delete this staff member?')) {
+                    $('#deleteStaffForm').submit();
+                }
             });
 
-            $('#customerForm').on('submit', function(e) {
+            $('#deleteCustomerBtn').on('click', function(e) {
+                e.preventDefault();
                 if (!selectedCustomerId) {
-                    e.preventDefault();
                     alert('Please select a customer first');
                     return false;
                 }
-                return true;
+                if (confirm('Are you sure you want to delete this customer?')) {
+                    $('#deleteCustomerForm').submit();
+                }
             });
 
-            $('#productForm').on('submit', function(e) {
+            $('#deleteProductBtn').on('click', function(e) {
+                e.preventDefault();
                 if (!selectedProductId) {
-                    e.preventDefault();
                     alert('Please select a product first');
                     return false;
                 }
-                return true;
-            });
-
-            $('#deleteStaffForm').on('submit', function(e) {
-                if (!selectedStaffId) {
-                    e.preventDefault();
-                    alert('Please select a staff member first');
-                    return false;
+                if (confirm('Are you sure you want to delete this product?')) {
+                    $('#deleteProductForm').submit();
                 }
-                if (!confirm('Are you sure you want to delete this staff member?')) {
-                    e.preventDefault();
-                    return false;
-                }
-                return true;
-            });
-
-            $('#deleteCustomerForm').on('submit', function(e) {
-                if (!selectedCustomerId) {
-                    e.preventDefault();
-                    alert('Please select a customer first');
-                    return false;
-                }
-                if (!confirm('Are you sure you want to delete this customer?')) {
-                    e.preventDefault();
-                    return false;
-                }
-                return true;
-            });
-
-            $('#deleteProductForm').on('submit', function(e) {
-                if (!selectedProductId) {
-                    e.preventDefault();
-                    alert('Please select a product first');
-                    return false;
-                }
-                if (!confirm('Are you sure you want to delete this product?')) {
-                    e.preventDefault();
-                    return false;
-                }
-                return true;
             });
         });
     </script>

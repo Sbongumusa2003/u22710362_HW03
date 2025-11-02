@@ -219,6 +219,13 @@
         </div>
     }
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <div class="section-container">
         <!-- Staff Section -->
         <div class="section-box">
@@ -253,10 +260,11 @@
             <div class="pagination" id="staffPagination"></div>
 
             <div class="action-buttons">
-                <button class="btn btn-sm btn-primary" id="createStaffBtn">Create</button>
+                <button type="button" class="btn btn-sm btn-primary" id="createStaffBtn">Create</button>
             </div>
         </div>
 
+        <!-- Customer Section -->
         <div class="section-box">
             <h4>Customers</h4>
 
@@ -289,10 +297,11 @@
             <div class="pagination" id="customerPagination"></div>
 
             <div class="action-buttons">
-                <button class="btn btn-sm btn-primary" id="createCustomerBtn">Create</button>
+                <button type="button" class="btn btn-sm btn-primary" id="createCustomerBtn">Create</button>
             </div>
         </div>
 
+        <!-- Product Section -->
         <div class="section-box">
             <h4>Products</h4>
 
@@ -361,10 +370,11 @@
     </div>
 </div>
 
+<!-- Staff Modal -->
 <div class="modal fade" id="staffModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            @using (Html.BeginForm("CreateStaff", "Home", FormMethod.Post, new { id = "staffForm" }))
+            @using (Html.BeginForm("CreateStaff", "Home", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 <div class="modal-header">
@@ -374,30 +384,30 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">First Name *</label>
-                        <input type="text" class="form-control" name="first_name" id="modal_staff_first_name" required>
+                        <input type="text" class="form-control" name="first_name" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Last Name *</label>
-                        <input type="text" class="form-control" name="last_name" id="modal_staff_last_name" required>
+                        <input type="text" class="form-control" name="last_name" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email *</label>
-                        <input type="email" class="form-control" name="email" id="modal_staff_email" required>
+                        <input type="email" class="form-control" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Phone</label>
-                        <input type="text" class="form-control" name="phone" id="modal_staff_phone">
+                        <input type="text" class="form-control" name="phone">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Active *</label>
-                        <select class="form-select" name="active" id="modal_staff_active">
+                        <select class="form-select" name="active" required>
                             <option value="1">Yes</option>
                             <option value="0">No</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Store *</label>
-                        <select class="form-select" name="store_id" id="modal_staff_store" required>
+                        <select class="form-select" name="store_id" required>
                             @if (ViewBag.Stores != null)
                             {
                                 foreach (var store in ViewBag.Stores)
@@ -409,7 +419,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Manager</label>
-                        <select class="form-select" name="manager_id" id="modal_staff_manager">
+                        <select class="form-select" name="manager_id">
                             <option value="">No Manager</option>
                             @if (Model != null && Model.Staffs != null)
                             {
@@ -430,11 +440,11 @@
     </div>
 </div>
 
-<!-- Modal for Customer Creation -->
+<!-- Customer Modal -->
 <div class="modal fade" id="customerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            @using (Html.BeginForm("CreateCustomer", "Home", FormMethod.Post, new { id = "customerForm" }))
+            @using (Html.BeginForm("CreateCustomer", "Home", FormMethod.Post))
             {
                 @Html.AntiForgeryToken()
                 <div class="modal-header">
@@ -444,35 +454,35 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">First Name *</label>
-                        <input type="text" class="form-control" name="first_name" id="modal_customer_first_name" required>
+                        <input type="text" class="form-control" name="first_name" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Last Name *</label>
-                        <input type="text" class="form-control" name="last_name" id="modal_customer_last_name" required>
+                        <input type="text" class="form-control" name="last_name" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email *</label>
-                        <input type="email" class="form-control" name="email" id="modal_customer_email" required>
+                        <input type="email" class="form-control" name="email" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Phone</label>
-                        <input type="text" class="form-control" name="phone" id="modal_customer_phone">
+                        <input type="text" class="form-control" name="phone">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Street</label>
-                        <input type="text" class="form-control" name="street" id="modal_customer_street">
+                        <input type="text" class="form-control" name="street">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">City</label>
-                        <input type="text" class="form-control" name="city" id="modal_customer_city">
+                        <input type="text" class="form-control" name="city">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">State</label>
-                        <input type="text" class="form-control" name="state" id="modal_customer_state">
+                        <input type="text" class="form-control" name="state">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Zip Code</label>
-                        <input type="text" class="form-control" name="zip_code" id="modal_customer_zip" maxlength="5">
+                        <input type="text" class="form-control" name="zip_code" maxlength="5">
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -536,7 +546,6 @@
             var selectedCustomerId = null;
             var selectedProductId = null;
 
-            // PURE JQUERY - Pagination function
             function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
                 var $pagination = $('#' + paginationElementId);
@@ -548,18 +557,14 @@
                     $('<button>&lt;&lt;</button>')
                         .prop('disabled', currentPage === 1)
                         .on('click', function() {
-                            if (currentPage !== 1) {
-                                onPageChange(1);
-                            }
+                            if (currentPage !== 1) onPageChange(1);
                         })
                 );
                 $pagination.append(
                     $('<button>&lt;</button>')
                         .prop('disabled', currentPage === 1)
                         .on('click', function() {
-                            if (currentPage > 1) {
-                                onPageChange(currentPage - 1);
-                            }
+                            if (currentPage > 1) onPageChange(currentPage - 1);
                         })
                 );
 
@@ -567,44 +572,27 @@
                 var endPage = Math.min(totalPages, currentPage + 2);
 
                 if (startPage > 1) {
-                    $pagination.append(
-                        $('<button>1</button>').on('click', function() { onPageChange(1); })
-                    );
-
-                    if (startPage > 2) {
-                        $pagination.append($('<button disabled>...</button>'));
-                    }
+                    $pagination.append($('<button>1</button>').on('click', function() { onPageChange(1); }));
+                    if (startPage > 2) $pagination.append($('<button disabled>...</button>'));
                 }
 
                 for (var i = startPage; i <= endPage; i++) {
                     var $pageBtn = $('<button>' + i + '</button>');
-                    if (i === currentPage) {
-                        $pageBtn.addClass('active');
-                    }
-                    $pageBtn.data('page', i);
-                    $pageBtn.on('click', function() {
-                        onPageChange($(this).data('page'));
-                    });
+                    if (i === currentPage) $pageBtn.addClass('active');
+                    $pageBtn.data('page', i).on('click', function() { onPageChange($(this).data('page')); });
                     $pagination.append($pageBtn);
                 }
 
                 if (endPage < totalPages) {
-                    if (endPage < totalPages - 1) {
-                        $pagination.append($('<button disabled>...</button>'));
-                    }
-                    $pagination.append(
-                        $('<button>' + totalPages + '</button>')
-                            .on('click', function() { onPageChange(totalPages); })
-                    );
+                    if (endPage < totalPages - 1) $pagination.append($('<button disabled>...</button>'));
+                    $pagination.append($('<button>' + totalPages + '</button>').on('click', function() { onPageChange(totalPages); }));
                 }
 
                 $pagination.append(
                     $('<button>&gt;</button>')
                         .prop('disabled', currentPage === totalPages)
                         .on('click', function() {
-                            if (currentPage < totalPages) {
-                                onPageChange(currentPage + 1);
-                            }
+                            if (currentPage < totalPages) onPageChange(currentPage + 1);
                         })
                 );
 
@@ -612,9 +600,7 @@
                     $('<button>&gt;&gt;</button>')
                         .prop('disabled', currentPage === totalPages)
                         .on('click', function() {
-                            if (currentPage !== totalPages) {
-                                onPageChange(totalPages);
-                            }
+                            if (currentPage !== totalPages) onPageChange(totalPages);
                         })
                 );
             }
@@ -636,18 +622,14 @@
                             .attr('data-id', staff.staff_id)
                             .text(staff.first_name + ' ' + staff.last_name + ' - ' + staff.store_name);
 
-                        if (staff.staff_id === selectedStaffId) {
-                            $li.addClass('selected');
-                        }
+                        if (staff.staff_id === selectedStaffId) $li.addClass('selected');
                         $list.append($li);
                     });
                 }
 
                 createPagination(staffData.length, page, 'staffPagination', displayStaffList);
-
                 var totalPages = Math.ceil(staffData.length / itemsPerPage);
                 $('#staffPageInfo').text('Page ' + page + ' of ' + totalPages);
-
                 attachStaffClickHandlers();
             }
 
@@ -668,18 +650,14 @@
                             .attr('data-id', customer.customer_id)
                             .text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
 
-                        if (customer.customer_id === selectedCustomerId) {
-                            $li.addClass('selected');
-                        }
+                        if (customer.customer_id === selectedCustomerId) $li.addClass('selected');
                         $list.append($li);
                     });
                 }
 
                 createPagination(customerData.length, page, 'customerPagination', displayCustomerList);
-
                 var totalPages = Math.ceil(customerData.length / itemsPerPage);
                 $('#customerPageInfo').text('Page ' + page + ' of ' + totalPages);
-
                 attachCustomerClickHandlers();
             }
 
@@ -700,18 +678,14 @@
                             .attr('data-id', product.product_id)
                             .text(product.product_name + ' - $' + product.list_price.toFixed(2));
 
-                        if (product.product_id === selectedProductId) {
-                            $li.addClass('selected');
-                        }
+                        if (product.product_id === selectedProductId) $li.addClass('selected');
                         $list.append($li);
                     });
                 }
 
                 createPagination(filteredProductData.length, page, 'productPagination', displayProductList);
-
                 var totalPages = Math.ceil(filteredProductData.length / itemsPerPage);
                 $('#productPageInfo').text('Page ' + page + ' of ' + totalPages);
-
                 attachProductClickHandlers();
             }
 
@@ -721,9 +695,7 @@
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var staff = $.grep(staffData, function(s) {
-                        return s.staff_id === selectedStaffId;
-                    })[0];
+                    var staff = $.grep(staffData, function(s) { return s.staff_id === selectedStaffId; })[0];
 
                     if (staff) {
                         $('#staff_first_name').val(staff.first_name);
@@ -741,9 +713,7 @@
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var customer = $.grep(customerData, function(c) {
-                        return c.customer_id === selectedCustomerId;
-                    })[0];
+                    var customer = $.grep(customerData, function(c) { return c.customer_id === selectedCustomerId; })[0];
 
                     if (customer) {
                         $('#customer_first_name').val(customer.first_name);
@@ -761,9 +731,7 @@
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var product = $.grep(filteredProductData, function(p) {
-                        return p.product_id === selectedProductId;
-                    })[0];
+                    var product = $.grep(filteredProductData, function(p) { return p.product_id === selectedProductId; })[0];
 
                     if (product) {
                         $('#product_name').text(product.product_name);
@@ -800,16 +768,7 @@
 
                 $('<img>')
                     .on('load', function() {
-                        $('#productImageContainer').html(
-                            $('<img>')
-                                .attr('src', paths[index])
-                                .attr('alt', 'Product Image')
-                                .css({
-                                    'max-width': '100%',
-                                    'max-height': '100%',
-                                    'object-fit': 'contain'
-                                })
-                        );
+                        $('#productImageContainer').html($('<img>').attr('src', paths[index]).attr('alt', 'Product Image'));
                     })
                     .on('error', function() {
                         tryLoadImage(paths, index + 1);
@@ -836,58 +795,13 @@
             displayProductList(1);
 
             $('#createStaffBtn').on('click', function() {
-                $('#modal_staff_first_name').val('');
-                $('#modal_staff_last_name').val('');
-                $('#modal_staff_email').val('');
-                $('#modal_staff_phone').val('');
-                $('#modal_staff_active').val('1');
-                $('#modal_staff_store').val($('#modal_staff_store option:first').val());
-                $('#modal_staff_manager').val('');
-
                 var staffModal = new bootstrap.Modal(document.getElementById('staffModal'));
                 staffModal.show();
             });
 
-            $('#staffForm').on('submit', function(e) {
-                var firstName = $.trim($('#modal_staff_first_name').val());
-                var lastName = $.trim($('#modal_staff_last_name').val());
-                var email = $.trim($('#modal_staff_email').val());
-
-                if (!firstName || !lastName || !email) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields (First Name, Last Name, Email)');
-                    return false;
-                }
-
-                return true;
-            });
-
             $('#createCustomerBtn').on('click', function() {
-                $('#modal_customer_first_name').val('');
-                $('#modal_customer_last_name').val('');
-                $('#modal_customer_email').val('');
-                $('#modal_customer_phone').val('');
-                $('#modal_customer_street').val('');
-                $('#modal_customer_city').val('');
-                $('#modal_customer_state').val('');
-                $('#modal_customer_zip').val('');
-
                 var customerModal = new bootstrap.Modal(document.getElementById('customerModal'));
                 customerModal.show();
-            });
-
-            $('#customerForm').on('submit', function(e) {
-                var firstName = $.trim($('#modal_customer_first_name').val());
-                var lastName = $.trim($('#modal_customer_last_name').val());
-                var email = $.trim($('#modal_customer_email').val());
-
-                if (!firstName || !lastName || !email) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields (First Name, Last Name, Email)');
-                    return false;
-                }
-
-                return true;
             });
 
             $('#productBrandFilter, #productCategoryFilter').on('change', filterProducts);
