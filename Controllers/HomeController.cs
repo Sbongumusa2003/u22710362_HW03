@@ -14,34 +14,25 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        // GET: Home
         public async Task<ActionResult> Index()
         {
             try
             {
-                // Populate ViewBag for dropdown filters and modals
                 ViewBag.Brands = await db.brands.OrderBy(b => b.brand_name).ToListAsync();
                 ViewBag.Categories = await db.categories.OrderBy(c => c.category_name).ToListAsync();
                 ViewBag.Stores = await db.stores.OrderBy(s => s.store_name).ToListAsync();
-
-                // Create the view model with all necessary data
                 var model = new HomeViewModel
                 {
-                    // Load staff with eager loading for related entities
                     Staffs = await db.staffs
                         .Include(s => s.stores)
-                        .Include(s => s.staffs2) // Manager relationship
+                        .Include(s => s.staffs2)
                         .OrderBy(s => s.last_name)
                         .ThenBy(s => s.first_name)
                         .ToListAsync(),
-
-                    // Load customers
                     Customers = await db.customers
                         .OrderBy(c => c.last_name)
                         .ThenBy(c => c.first_name)
                         .ToListAsync(),
-
-                    // Load products with brands and categories
                     Products = await db.products
                         .Include(p => p.brands)
                         .Include(p => p.categories)
@@ -53,7 +44,6 @@ namespace u22710362_HW03.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
                 ViewBag.ErrorMessage = "Error loading data: " + ex.Message;
                 return View(new HomeViewModel
                 {
@@ -64,7 +54,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Home/CreateStaff - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateStaff([Bind(Include = "first_name,last_name,email,phone,active,store_id,manager_id")] staffs staff)
@@ -73,15 +62,12 @@ namespace u22710362_HW03.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Validate that store exists
                     var storeExists = await db.stores.AnyAsync(s => s.store_id == staff.store_id);
                     if (!storeExists)
                     {
                         TempData["ErrorMessage"] = "Invalid store selected";
                         return RedirectToAction("Index");
                     }
-
-                    // Validate manager if provided
                     if (staff.manager_id.HasValue)
                     {
                         var managerExists = await db.staffs.AnyAsync(s => s.staff_id == staff.manager_id.Value);
@@ -91,16 +77,12 @@ namespace u22710362_HW03.Controllers
                             return RedirectToAction("Index");
                         }
                     }
-
-                    // Add staff to database
                     db.staffs.Add(staff);
                     await db.SaveChangesAsync();
 
                     TempData["SuccessMessage"] = "Staff member created successfully!";
                     return RedirectToAction("Index");
                 }
-
-                // Collect validation errors
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage)
@@ -116,7 +98,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Home/CreateCustomer - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateCustomer([Bind(Include = "first_name,last_name,phone,email,street,city,state,zip_code")] customers customer)
@@ -125,14 +106,11 @@ namespace u22710362_HW03.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Validate email format (basic check)
                     if (!string.IsNullOrEmpty(customer.email) && !customer.email.Contains("@"))
                     {
                         TempData["ErrorMessage"] = "Invalid email format";
                         return RedirectToAction("Index");
                     }
-
-                    // Add customer to database
                     db.customers.Add(customer);
                     await db.SaveChangesAsync();
 
@@ -140,7 +118,6 @@ namespace u22710362_HW03.Controllers
                     return RedirectToAction("Index");
                 }
 
-                // Collect validation errors
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage)
@@ -156,35 +133,31 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
-        // GET: Home/FilterProducts
+
         [HttpGet]
         public async Task<ActionResult> FilterProducts(int? brandId, int? categoryId)
         {
             try
             {
-                // Start with all products
+
                 var products = db.products
                     .Include(p => p.brands)
                     .Include(p => p.categories)
                     .AsQueryable();
 
-                // Apply brand filter if provided and not 0
+   
                 if (brandId.HasValue && brandId.Value > 0)
                 {
                     products = products.Where(p => p.brand_id == brandId.Value);
                 }
-
-                // Apply category filter if provided and not 0
                 if (categoryId.HasValue && categoryId.Value > 0)
                 {
                     products = products.Where(p => p.category_id == categoryId.Value);
                 }
 
-                // Order results
                 products = products.OrderBy(p => p.product_name);
 
-                // Execute query and project to anonymous type for JSON
+                
                 var result = await products.Select(p => new
                 {
                     product_id = p.product_id,
@@ -213,8 +186,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
-        // GET: Home/GetStaffOrders/{staffId}
+        
         [HttpGet]
         public async Task<ActionResult> GetStaffOrders(int staffId)
         {
@@ -224,7 +196,7 @@ namespace u22710362_HW03.Controllers
                     .Where(o => o.staff_id == staffId)
                     .Include(o => o.customers)
                     .OrderByDescending(o => o.order_date)
-                    .Take(10) // Limit to most recent 10 orders
+                    .Take(10) 
                     .Select(o => new
                     {
                         order_id = o.order_id,
@@ -250,8 +222,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
-        // GET: Home/GetCustomerOrders/{customerId}
+        
         [HttpGet]
         public async Task<ActionResult> GetCustomerOrders(int customerId)
         {
@@ -261,7 +232,7 @@ namespace u22710362_HW03.Controllers
                     .Where(o => o.customer_id == customerId)
                     .Include(o => o.stores)
                     .OrderByDescending(o => o.order_date)
-                    .Take(10) // Limit to most recent 10 orders
+                    .Take(10) 
                     .Select(o => new
                     {
                         order_id = o.order_id,
@@ -287,8 +258,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
-        // GET: Home/GetProductDetails/{productId}
+        
         [HttpGet]
         public async Task<ActionResult> GetProductDetails(int productId)
         {
