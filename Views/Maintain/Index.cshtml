@@ -372,7 +372,7 @@
             var productCurrentPage = 1;
             var itemsPerPage = 10;
 
-            // Pagination function
+            // Pagination function using jQuery
             function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
                 var $pagination = $('#' + paginationElementId);
@@ -381,33 +381,35 @@
                 if (totalPages <= 1) return;
 
                 // First button
-                var $first = $('<button>&lt;&lt;</button>');
-                $first.prop('disabled', currentPage === 1);
-                $first.click(function() {
-                    if (currentPage !== 1) {
-                        onPageChange(1);
-                    }
-                });
-                $pagination.append($first);
+                $pagination.append(
+                    $('<button>&lt;&lt;</button>')
+                        .prop('disabled', currentPage === 1)
+                        .on('click', function() {
+                            if (currentPage !== 1) {
+                                onPageChange(1);
+                            }
+                        })
+                );
 
                 // Previous button
-                var $prev = $('<button>&lt;</button>');
-                $prev.prop('disabled', currentPage === 1);
-                $prev.click(function() {
-                    if (currentPage > 1) {
-                        onPageChange(currentPage - 1);
-                    }
-                });
-                $pagination.append($prev);
+                $pagination.append(
+                    $('<button>&lt;</button>')
+                        .prop('disabled', currentPage === 1)
+                        .on('click', function() {
+                            if (currentPage > 1) {
+                                onPageChange(currentPage - 1);
+                            }
+                        })
+                );
 
                 // Page numbers
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, currentPage + 2);
 
                 if (startPage > 1) {
-                    var $page1 = $('<button>1</button>');
-                    $page1.click(function() { onPageChange(1); });
-                    $pagination.append($page1);
+                    $pagination.append(
+                        $('<button>1</button>').on('click', function() { onPageChange(1); })
+                    );
 
                     if (startPage > 2) {
                         $pagination.append($('<button disabled>...</button>'));
@@ -420,7 +422,7 @@
                         $pageBtn.addClass('active');
                     }
                     $pageBtn.data('page', i);
-                    $pageBtn.click(function() {
+                    $pageBtn.on('click', function() {
                         onPageChange($(this).data('page'));
                     });
                     $pagination.append($pageBtn);
@@ -430,33 +432,36 @@
                     if (endPage < totalPages - 1) {
                         $pagination.append($('<button disabled>...</button>'));
                     }
-                    var $pageLast = $('<button>' + totalPages + '</button>');
-                    $pageLast.click(function() { onPageChange(totalPages); });
-                    $pagination.append($pageLast);
+                    $pagination.append(
+                        $('<button>' + totalPages + '</button>')
+                            .on('click', function() { onPageChange(totalPages); })
+                    );
                 }
 
                 // Next button
-                var $next = $('<button>&gt;</button>');
-                $next.prop('disabled', currentPage === totalPages);
-                $next.click(function() {
-                    if (currentPage < totalPages) {
-                        onPageChange(currentPage + 1);
-                    }
-                });
-                $pagination.append($next);
+                $pagination.append(
+                    $('<button>&gt;</button>')
+                        .prop('disabled', currentPage === totalPages)
+                        .on('click', function() {
+                            if (currentPage < totalPages) {
+                                onPageChange(currentPage + 1);
+                            }
+                        })
+                );
 
                 // Last button
-                var $last = $('<button>&gt;&gt;</button>');
-                $last.prop('disabled', currentPage === totalPages);
-                $last.click(function() {
-                    if (currentPage !== totalPages) {
-                        onPageChange(totalPages);
-                    }
-                });
-                $pagination.append($last);
+                $pagination.append(
+                    $('<button>&gt;&gt;</button>')
+                        .prop('disabled', currentPage === totalPages)
+                        .on('click', function() {
+                            if (currentPage !== totalPages) {
+                                onPageChange(totalPages);
+                            }
+                        })
+                );
             }
 
-            // Display staff list
+            // Display staff list using jQuery
             function displayStaffList(page) {
                 staffCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -466,10 +471,11 @@
                 var $list = $('#maintainStaffList');
                 $list.empty();
 
-                pageData.forEach(function(staff) {
-                    var $li = $('<li class="staff-item"></li>');
-                    $li.attr('data-id', staff.staff_id);
-                    $li.text(staff.first_name + ' ' + staff.last_name + ' - ' + (staff.stores ? staff.stores.store_name : 'N/A'));
+                $.each(pageData, function(index, staff) {
+                    var $li = $('<li class="staff-item"></li>')
+                        .attr('data-id', staff.staff_id)
+                        .text(staff.first_name + ' ' + staff.last_name + ' - ' +
+                              (staff.stores ? staff.stores.store_name : 'N/A'));
                     $list.append($li);
                 });
 
@@ -478,11 +484,10 @@
                 var totalPages = Math.ceil(staffData.length / itemsPerPage);
                 $('#staffPageInfo').text('Page ' + page + ' of ' + totalPages);
 
-                // Reattach click handlers
                 attachStaffClickHandlers();
             }
 
-            // Display customer list
+            // Display customer list using jQuery
             function displayCustomerList(page) {
                 customerCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -492,10 +497,11 @@
                 var $list = $('#maintainCustomerList');
                 $list.empty();
 
-                pageData.forEach(function(customer) {
-                    var $li = $('<li class="customer-item"></li>');
-                    $li.attr('data-id', customer.customer_id);
-                    $li.text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
+                $.each(pageData, function(index, customer) {
+                    var $li = $('<li class="customer-item"></li>')
+                        .attr('data-id', customer.customer_id)
+                        .text(customer.first_name + ' ' + customer.last_name + ' - ' +
+                              (customer.city || 'N/A'));
                     $list.append($li);
                 });
 
@@ -504,11 +510,10 @@
                 var totalPages = Math.ceil(customerData.length / itemsPerPage);
                 $('#customerPageInfo').text('Page ' + page + ' of ' + totalPages);
 
-                // Reattach click handlers
                 attachCustomerClickHandlers();
             }
 
-            // Display product list
+            // Display product list using jQuery
             function displayProductList(page) {
                 productCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -518,12 +523,12 @@
                 var $list = $('#maintainProductList');
                 $list.empty();
 
-                pageData.forEach(function(product) {
-                    var $li = $('<li class="product-item"></li>');
-                    $li.attr('data-id', product.product_id);
-                    $li.attr('data-product-name', product.product_name);
-                    $li.attr('data-brand-name', product.brand_name);
-                    $li.text(product.product_name + ' - $' + product.list_price.toFixed(2));
+                $.each(pageData, function(index, product) {
+                    var $li = $('<li class="product-item"></li>')
+                        .attr('data-id', product.product_id)
+                        .attr('data-product-name', product.product_name)
+                        .attr('data-brand-name', product.brand_name)
+                        .text(product.product_name + ' - $' + product.list_price.toFixed(2));
                     $list.append($li);
                 });
 
@@ -532,17 +537,17 @@
                 var totalPages = Math.ceil(productData.length / itemsPerPage);
                 $('#productPageInfo').text('Page ' + page + ' of ' + totalPages);
 
-                // Reattach click handlers
                 attachProductClickHandlers();
             }
 
-            // Attach staff click handlers
+            // Attach staff click handlers using jQuery AJAX
             function attachStaffClickHandlers() {
-                $('.staff-item').click(function () {
+                $('#maintainStaffList').off('click', '.staff-item').on('click', '.staff-item', function() {
                     selectedStaffId = $(this).data('id');
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
+                    // jQuery AJAX call to get staff details
                     $.ajax({
                         url: '@Url.Action("GetStaff", "Maintain")/' + selectedStaffId,
                         type: 'GET',
@@ -565,13 +570,14 @@
                 });
             }
 
-            // Attach customer click handlers
+            // Attach customer click handlers using jQuery AJAX
             function attachCustomerClickHandlers() {
-                $('.customer-item').click(function () {
+                $('#maintainCustomerList').off('click', '.customer-item').on('click', '.customer-item', function() {
                     selectedCustomerId = $(this).data('id');
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
+                    // jQuery AJAX call to get customer details
                     $.ajax({
                         url: '@Url.Action("GetCustomer", "Maintain")/' + selectedCustomerId,
                         type: 'GET',
@@ -593,9 +599,9 @@
                 });
             }
 
-            // Attach product click handlers
+            // Attach product click handlers using jQuery AJAX
             function attachProductClickHandlers() {
-                $('.product-item').click(function () {
+                $('#maintainProductList').off('click', '.product-item').on('click', '.product-item', function() {
                     selectedProductId = $(this).data('id');
                     var productName = $(this).data('product-name');
                     var brandName = $(this).data('brand-name');
@@ -603,6 +609,7 @@
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
+                    // jQuery AJAX call to get product details
                     $.ajax({
                         url: '@Url.Action("GetProduct", "Maintain")/' + selectedProductId,
                         type: 'GET',
@@ -626,31 +633,31 @@
                 });
             }
 
-            // Function to load product image
+            // Function to load product image using jQuery
             function loadProductImage(productId, brandName, productName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
                 // Try product ID based images first
-                extensions.forEach(function(ext) {
+                $.each(extensions, function(index, ext) {
                     imagePaths.push('~/Content/Images/' + productId + ext);
                 });
 
                 // Try product name variations
                 if (productName) {
                     var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
-                    extensions.forEach(function(ext) {
+                    $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + productNameClean + ext);
                     });
                     var productNameNoSpaces = productName.replace(/\s+/g, '');
-                    extensions.forEach(function(ext) {
+                    $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + productNameNoSpaces + ext);
                     });
                 }
 
                 // Try brand name based images
                 if (brandName && brandName !== 'N/A') {
-                    extensions.forEach(function(ext) {
+                    $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
                         imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
                         imagePaths.push('~/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
@@ -658,7 +665,7 @@
                 }
 
                 // Try generic bicycle image
-                extensions.forEach(function(ext) {
+                $.each(extensions, function(index, ext) {
                     imagePaths.push('~/Content/Images/bicycle' + ext);
                     imagePaths.push('~/Content/Images/bike' + ext);
                     imagePaths.push('~/Content/Images/default' + ext);
@@ -667,24 +674,21 @@
                 tryLoadImage(imagePaths, 0);
             }
 
-            // Recursively try to load images
+            // Recursively try to load images using jQuery
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
-                    // No image found, show placeholder
                     $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
                     return;
                 }
 
-                var img = new Image();
-                img.onload = function() {
-                    // Image found
-                    $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" />');
-                };
-                img.onerror = function() {
-                    // Try next path
-                    tryLoadImage(paths, index + 1);
-                };
-                img.src = paths[index];
+                $('<img>')
+                    .on('load', function() {
+                        $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" />');
+                    })
+                    .on('error', function() {
+                        tryLoadImage(paths, index + 1);
+                    })
+                    .attr('src', paths[index]);
             }
 
             // Initialize lists
@@ -692,8 +696,8 @@
             displayCustomerList(1);
             displayProductList(1);
 
-            // Update Staff
-            $('#updateStaffBtn').click(function () {
+            // Update Staff using jQuery AJAX
+            $('#updateStaffBtn').on('click', function () {
                 if (!selectedStaffId) {
                     alert('Please select a staff member first');
                     return;
@@ -714,22 +718,24 @@
                     url: '@Url.Action("EditStaff", "Maintain")',
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
-                            location.reload();
+                            window.location.reload();
                         } else {
                             alert(response.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         alert('Error: ' + error);
+                        console.error('AJAX Error:', status, error);
                     }
                 });
             });
 
-            // Delete Staff
-            $('#deleteStaffBtn').click(function () {
+            // Delete Staff using jQuery AJAX
+            $('#deleteStaffBtn').on('click', function () {
                 if (!selectedStaffId) {
                     alert('Please select a staff member first');
                     return;
@@ -743,23 +749,25 @@
                             id: selectedStaffId,
                             __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                         },
+                        dataType: 'json',
                         success: function (response) {
                             if (response.success) {
                                 alert(response.message);
-                                location.reload();
+                                window.location.reload();
                             } else {
                                 alert(response.message);
                             }
                         },
                         error: function(xhr, status, error) {
                             alert('Error: ' + error);
+                            console.error('AJAX Error:', status, error);
                         }
                     });
                 }
             });
 
-            // Update Customer
-            $('#updateCustomerBtn').click(function () {
+            // Update Customer using jQuery AJAX
+            $('#updateCustomerBtn').on('click', function () {
                 if (!selectedCustomerId) {
                     alert('Please select a customer first');
                     return;
@@ -779,22 +787,24 @@
                     url: '@Url.Action("EditCustomer", "Maintain")',
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
-                            location.reload();
+                            window.location.reload();
                         } else {
                             alert(response.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         alert('Error: ' + error);
+                        console.error('AJAX Error:', status, error);
                     }
                 });
             });
 
-            // Delete Customer
-            $('#deleteCustomerBtn').click(function () {
+            // Delete Customer using jQuery AJAX
+            $('#deleteCustomerBtn').on('click', function () {
                 if (!selectedCustomerId) {
                     alert('Please select a customer first');
                     return;
@@ -808,23 +818,25 @@
                             id: selectedCustomerId,
                             __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                         },
+                        dataType: 'json',
                         success: function (response) {
                             if (response.success) {
                                 alert(response.message);
-                                location.reload();
+                                window.location.reload();
                             } else {
                                 alert(response.message);
                             }
                         },
                         error: function(xhr, status, error) {
                             alert('Error: ' + error);
+                            console.error('AJAX Error:', status, error);
                         }
                     });
                 }
             });
 
-            // Update Product
-            $('#updateProductBtn').click(function () {
+            // Update Product using jQuery AJAX
+            $('#updateProductBtn').on('click', function () {
                 if (!selectedProductId) {
                     alert('Please select a product first');
                     return;
@@ -844,22 +856,24 @@
                     url: '@Url.Action("EditProduct", "Maintain")',
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function (response) {
                         if (response.success) {
                             alert(response.message);
-                            location.reload();
+                            window.location.reload();
                         } else {
                             alert(response.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         alert('Error: ' + error);
+                        console.error('AJAX Error:', status, error);
                     }
                 });
             });
 
-            // Delete Product
-            $('#deleteProductBtn').click(function () {
+            // Delete Product using jQuery AJAX
+            $('#deleteProductBtn').on('click', function () {
                 if (!selectedProductId) {
                     alert('Please select a product first');
                     return;
@@ -873,16 +887,18 @@
                             id: selectedProductId,
                             __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
                         },
+                        dataType: 'json',
                         success: function (response) {
                             if (response.success) {
                                 alert(response.message);
-                                location.reload();
+                                window.location.reload();
                             } else {
                                 alert(response.message);
                             }
                         },
                         error: function(xhr, status, error) {
                             alert('Error: ' + error);
+                            console.error('AJAX Error:', status, error);
                         }
                     });
                 }
