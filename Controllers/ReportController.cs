@@ -15,12 +15,10 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        // GET: Report
         public ActionResult Index()
         {
             try
             {
-                // Get report data - Popular Products Report
                 var popularProducts = db.order_items
                     .GroupBy(oi => oi.product_id)
                     .Select(g => new
@@ -58,11 +56,10 @@ namespace u22710362_HW03.Controllers
                 ViewBag.TotalOrders = db.orders.Count();
                 ViewBag.TotalCustomers = db.customers.Count();
 
-                // Get saved files from Reports folder
                 var filesPath = Server.MapPath("~/Reports");
                 if (!Directory.Exists(filesPath))
                 {
-                    Directory.CreateDirectory(filesPath); // FIXED: Added the path parameter
+                    Directory.CreateDirectory(filesPath); 
                 }
 
                 var files = Directory.GetFiles(filesPath)
@@ -91,7 +88,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Report/SaveReport - Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult SaveReport(string fileName, string fileType, string reportHtml, string description)
@@ -104,14 +100,12 @@ namespace u22710362_HW03.Controllers
                     Directory.CreateDirectory(filesPath);
                 }
 
-                // Clean filename
                 fileName = fileName?.Trim();
                 if (string.IsNullOrEmpty(fileName))
                 {
                     fileName = "Report";
                 }
 
-                // Remove invalid characters
                 foreach (char c in Path.GetInvalidFileNameChars())
                 {
                     fileName = fileName.Replace(c, '_');
@@ -126,7 +120,6 @@ namespace u22710362_HW03.Controllers
                 }
                 else if (fileType.ToLower() == "txt")
                 {
-                    // Strip HTML tags for text file
                     var plainText = System.Text.RegularExpressions.Regex.Replace(reportHtml, "<.*?>", string.Empty);
                     plainText = System.Net.WebUtility.HtmlDecode(plainText);
                     plainText = System.Text.RegularExpressions.Regex.Replace(plainText, @"\s+", " ");
@@ -134,7 +127,6 @@ namespace u22710362_HW03.Controllers
                     System.IO.File.WriteAllText(filePath, plainText);
                 }
 
-                // Save description if provided
                 if (!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
                 {
                     var descriptionPath = Path.Combine(filesPath, fullFileName + ".description.txt");
@@ -151,7 +143,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // GET: Report/DownloadFile
         public ActionResult DownloadFile(string fileName)
         {
             try
@@ -174,7 +165,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Report/DeleteFile - Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteFile(string fileName)
@@ -188,7 +178,6 @@ namespace u22710362_HW03.Controllers
                 {
                     System.IO.File.Delete(filePath);
 
-                    // Delete description file if exists
                     var descriptionPath = filePath + ".description.txt";
                     if (System.IO.File.Exists(descriptionPath))
                     {
@@ -209,7 +198,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // GET: Report/GetFileDescription
         [HttpGet]
         public ActionResult GetFileDescription(string fileName)
         {
