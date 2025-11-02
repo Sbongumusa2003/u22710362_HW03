@@ -803,7 +803,7 @@
 
                 // Use proper URL path (remove ~/ and use relative or absolute path)
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('Images/' + productId + ext);
+                    imagePaths.push('/Images/' + productId + ext);
                 });
 
                 if (productName) {
@@ -821,8 +821,6 @@
 
                 $.each(extensions, function(index, ext) {
                     imagePaths.push('/Images/{productId}' + ext);
-                    imagePaths.push('/Images/{cleanProductName}' + ext);
-                    imagePaths.push('/Images/{brandName}' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
