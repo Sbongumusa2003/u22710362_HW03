@@ -212,7 +212,12 @@
         </div>
     }
 
-    @Html.AntiForgeryToken()
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
 
     <div class="section-container">
         <!-- Staff Section -->
@@ -362,64 +367,68 @@
 <div class="modal fade" id="staffModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create Staff</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">First Name *</label>
-                    <input type="text" class="form-control" id="modal_staff_first_name" required>
+            @using (Html.BeginForm("CreateStaff", "Home", FormMethod.Post, new { id = "staffForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Staff</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Last Name *</label>
-                    <input type="text" class="form-control" id="modal_staff_last_name" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Email *</label>
-                    <input type="email" class="form-control" id="modal_staff_email" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="modal_staff_phone">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Active *</label>
-                    <select class="form-select" id="modal_staff_active">
-                        <option value="1">Yes</option>
-                        <option value="0">No</option>
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Store *</label>
-                    <select class="form-select" id="modal_staff_store" required>
-                        @if (ViewBag.Stores != null)
-                        {
-                            foreach (var store in ViewBag.Stores)
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" class="form-control" name="first_name" id="modal_staff_first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name *</label>
+                        <input type="text" class="form-control" name="last_name" id="modal_staff_last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" name="email" id="modal_staff_email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="phone" id="modal_staff_phone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Active *</label>
+                        <select class="form-select" name="active" id="modal_staff_active">
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Store *</label>
+                        <select class="form-select" name="store_id" id="modal_staff_store" required>
+                            @if (ViewBag.Stores != null)
                             {
-                                <option value="@store.store_id">@store.store_name</option>
+                                foreach (var store in ViewBag.Stores)
+                                {
+                                    <option value="@store.store_id">@store.store_name</option>
+                                }
                             }
-                        }
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Manager</label>
-                    <select class="form-select" id="modal_staff_manager">
-                        <option value="">No Manager</option>
-                        @if (Model != null && Model.Staffs != null)
-                        {
-                            foreach (var staff in Model.Staffs)
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Manager</label>
+                        <select class="form-select" name="manager_id" id="modal_staff_manager">
+                            <option value="">No Manager</option>
+                            @if (Model != null && Model.Staffs != null)
                             {
-                                <option value="@staff.staff_id">@staff.first_name @staff.last_name</option>
+                                foreach (var staff in Model.Staffs)
+                                {
+                                    <option value="@staff.staff_id">@staff.first_name @staff.last_name</option>
+                                }
                             }
-                        }
-                    </select>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveStaffBtn">Save</button>
-            </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -428,48 +437,52 @@
 <div class="modal fade" id="customerModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create Customer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">First Name *</label>
-                    <input type="text" class="form-control" id="modal_customer_first_name" required>
+            @using (Html.BeginForm("CreateCustomer", "Home", FormMethod.Post, new { id = "customerForm" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Customer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Last Name *</label>
-                    <input type="text" class="form-control" id="modal_customer_last_name" required>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">First Name *</label>
+                        <input type="text" class="form-control" name="first_name" id="modal_customer_first_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Last Name *</label>
+                        <input type="text" class="form-control" name="last_name" id="modal_customer_last_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" name="email" id="modal_customer_email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="phone" id="modal_customer_phone">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Street</label>
+                        <input type="text" class="form-control" name="street" id="modal_customer_street">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">City</label>
+                        <input type="text" class="form-control" name="city" id="modal_customer_city">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">State</label>
+                        <input type="text" class="form-control" name="state" id="modal_customer_state">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Zip Code</label>
+                        <input type="text" class="form-control" name="zip_code" id="modal_customer_zip" maxlength="5">
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Email *</label>
-                    <input type="email" class="form-control" id="modal_customer_email" required>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Phone</label>
-                    <input type="text" class="form-control" id="modal_customer_phone">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Street</label>
-                    <input type="text" class="form-control" id="modal_customer_street">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">City</label>
-                    <input type="text" class="form-control" id="modal_customer_city">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">State</label>
-                    <input type="text" class="form-control" id="modal_customer_state">
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Zip Code</label>
-                    <input type="text" class="form-control" id="modal_customer_zip" maxlength="5">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveCustomerBtn">Save</button>
-            </div>
+            }
         </div>
     </div>
 </div>
@@ -477,7 +490,7 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Initialize data arrays from server
+            // Initialize data arrays from server (NO AJAX - data embedded at page load)
             var staffData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
                 Model.Staffs.Select(s => new {
                     staff_id = s.staff_id,
@@ -527,7 +540,7 @@
             var selectedCustomerId = null;
             var selectedProductId = null;
 
-            // Pagination function using jQuery
+            // PURE JQUERY - Pagination function
             function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
                 var $pagination = $('#' + paginationElementId);
@@ -616,7 +629,7 @@
                 );
             }
 
-            // Display staff list
+            // PURE JQUERY - Display staff list
             function displayStaffList(page) {
                 staffCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -649,7 +662,7 @@
                 attachStaffClickHandlers();
             }
 
-            // Display customer list
+            // PURE JQUERY - Display customer list
             function displayCustomerList(page) {
                 customerCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -682,7 +695,7 @@
                 attachCustomerClickHandlers();
             }
 
-            // Display product list
+            // PURE JQUERY - Display product list
             function displayProductList(page) {
                 productCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -715,13 +728,14 @@
                 attachProductClickHandlers();
             }
 
-            // Attach staff click handlers using jQuery event delegation
+            // PURE JQUERY - Attach staff click handlers (NO AJAX - uses local data)
             function attachStaffClickHandlers() {
                 $('#staffList').off('click', '.staff-item').on('click', '.staff-item', function() {
                     selectedStaffId = $(this).data('id');
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
+                    // Find staff in local data array (NO AJAX)
                     var staff = $.grep(staffData, function(s) {
                         return s.staff_id === selectedStaffId;
                     })[0];
@@ -736,13 +750,14 @@
                 });
             }
 
-            // Attach customer click handlers using jQuery event delegation
+            // PURE JQUERY - Attach customer click handlers (NO AJAX - uses local data)
             function attachCustomerClickHandlers() {
                 $('#customerList').off('click', '.customer-item').on('click', '.customer-item', function() {
                     selectedCustomerId = $(this).data('id');
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
+                    // Find customer in local data array (NO AJAX)
                     var customer = $.grep(customerData, function(c) {
                         return c.customer_id === selectedCustomerId;
                     })[0];
@@ -757,13 +772,14 @@
                 });
             }
 
-            // Attach product click handlers using jQuery event delegation
+            // PURE JQUERY - Attach product click handlers (NO AJAX - uses local data)
             function attachProductClickHandlers() {
                 $('#productList').off('click', '.product-item').on('click', '.product-item', function() {
                     selectedProductId = $(this).data('id');
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
+                    // Find product in local data array (NO AJAX)
                     var product = $.grep(filteredProductData, function(p) {
                         return p.product_id === selectedProductId;
                     })[0];
@@ -780,17 +796,15 @@
                 });
             }
 
-            // Load product image using jQuery
+            // PURE JQUERY - Load product image
             function loadProductImage(productId, brandName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
-                // Try product ID based images first
                 $.each(extensions, function(index, ext) {
                     imagePaths.push('~/Content/Images/' + productId + ext);
                 });
 
-                // Try product name variations
                 var product = $.grep(filteredProductData, function(p) {
                     return p.product_id === productId;
                 })[0];
@@ -800,22 +814,14 @@
                     $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + productNameClean + ext);
                     });
-                    var productNameNoSpaces = product.product_name.replace(/\s+/g, '');
-                    $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Content/Images/' + productNameNoSpaces + ext);
-                    });
                 }
 
-                // Try brand name based images
                 if (brandName) {
                     $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
-                        imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
-                        imagePaths.push('~/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
                     });
                 }
 
-                // Try generic bicycle image
                 $.each(extensions, function(index, ext) {
                     imagePaths.push('~/Content/Images/bicycle' + ext);
                     imagePaths.push('~/Content/Images/bike' + ext);
@@ -825,7 +831,7 @@
                 tryLoadImage(imagePaths, 0);
             }
 
-            // Recursively try to load images using jQuery
+            // PURE JQUERY - Recursively try to load images
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
                     $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
@@ -851,7 +857,7 @@
                     .attr('src', paths[index]);
             }
 
-            // Filter products
+            // PURE JQUERY - Filter products (NO AJAX - filters local data)
             function filterProducts() {
                 var brandId = $('#productBrandFilter').val();
                 var categoryId = $('#productCategoryFilter').val();
@@ -871,7 +877,7 @@
             displayCustomerList(1);
             displayProductList(1);
 
-            // Create Staff - jQuery event handler
+            // PURE JQUERY - Create Staff button (opens modal)
             $('#createStaffBtn').on('click', function() {
                 // Clear form using jQuery
                 $('#modal_staff_first_name').val('');
@@ -886,49 +892,23 @@
                 staffModal.show();
             });
 
-            // Save Staff using jQuery AJAX
-            $('#saveStaffBtn').on('click', function() {
+            // PURE JQUERY - Validate staff form before submission (NO AJAX)
+            $('#staffForm').on('submit', function(e) {
                 var firstName = $.trim($('#modal_staff_first_name').val());
                 var lastName = $.trim($('#modal_staff_last_name').val());
                 var email = $.trim($('#modal_staff_email').val());
 
                 if (!firstName || !lastName || !email) {
+                    e.preventDefault();
                     alert('Please fill in all required fields (First Name, Last Name, Email)');
-                    return;
+                    return false;
                 }
 
-                var data = {
-                    first_name: firstName,
-                    last_name: lastName,
-                    email: email,
-                    phone: $('#modal_staff_phone').val(),
-                    active: $('#modal_staff_active').val(),
-                    store_id: $('#modal_staff_store').val(),
-                    manager_id: $('#modal_staff_manager').val() || null,
-                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                };
-
-                $.ajax({
-                    url: '@Url.Action("CreateStaff", "Home")',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            window.location.reload();
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error: ' + error);
-                        console.error('AJAX Error:', status, error);
-                    }
-                });
+                // Form will submit normally (traditional POST)
+                return true;
             });
 
-            // Create Customer - jQuery event handler
+            // PURE JQUERY - Create Customer button (opens modal)
             $('#createCustomerBtn').on('click', function() {
                 // Clear form using jQuery
                 $('#modal_customer_first_name').val('');
@@ -944,50 +924,23 @@
                 customerModal.show();
             });
 
-            // Save Customer using jQuery AJAX
-            $('#saveCustomerBtn').on('click', function() {
+            // PURE JQUERY - Validate customer form before submission (NO AJAX)
+            $('#customerForm').on('submit', function(e) {
                 var firstName = $.trim($('#modal_customer_first_name').val());
                 var lastName = $.trim($('#modal_customer_last_name').val());
                 var email = $.trim($('#modal_customer_email').val());
 
                 if (!firstName || !lastName || !email) {
+                    e.preventDefault();
                     alert('Please fill in all required fields (First Name, Last Name, Email)');
-                    return;
+                    return false;
                 }
 
-                var data = {
-                    first_name: firstName,
-                    last_name: lastName,
-                    email: email,
-                    phone: $('#modal_customer_phone').val(),
-                    street: $('#modal_customer_street').val(),
-                    city: $('#modal_customer_city').val(),
-                    state: $('#modal_customer_state').val(),
-                    zip_code: $('#modal_customer_zip').val(),
-                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                };
-
-                $.ajax({
-                    url: '@Url.Action("CreateCustomer", "Home")',
-                    type: 'POST',
-                    data: data,
-                    dataType: 'json',
-                    success: function(response) {
-                        if (response.success) {
-                            alert(response.message);
-                            window.location.reload();
-                        } else {
-                            alert(response.message);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Error: ' + error);
-                        console.error('AJAX Error:', status, error);
-                    }
-                });
+                // Form will submit normally (traditional POST)
+                return true;
             });
 
-            // Product filtering using jQuery event handler
+            // PURE JQUERY - Product filtering event handler
             $('#productBrandFilter, #productCategoryFilter').on('change', filterProducts);
         });
     </script>
