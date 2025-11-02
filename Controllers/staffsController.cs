@@ -15,14 +15,11 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        // GET: staffs
         public async Task<ActionResult> Index()
         {
             var staffs = db.staffs.Include(s => s.staffs2).Include(s => s.staffs3).Include(s => s.staffs4).Include(s => s.stores);
             return View(await staffs.ToListAsync());
         }
-
-        // GET: staffs/Details/5
         public async Task<ActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,7 +34,6 @@ namespace u22710362_HW03.Controllers
             return View(staffs);
         }
 
-        // GET: staffs/Create
         public ActionResult Create()
         {
             ViewBag.manager_id = new SelectList(db.staffs, "staff_id", "first_name");
@@ -47,9 +43,6 @@ namespace u22710362_HW03.Controllers
             return View();
         }
 
-        // POST: staffs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create([Bind(Include = "staff_id,first_name,last_name,email,phone,active,store_id,manager_id")] staffs staffs)
@@ -68,7 +61,6 @@ namespace u22710362_HW03.Controllers
             return View(staffs);
         }
 
-        // GET: staffs/Edit/5
         public async Task<ActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,9 +79,6 @@ namespace u22710362_HW03.Controllers
             return View(staffs);
         }
 
-        // POST: staffs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit([Bind(Include = "staff_id,first_name,last_name,email,phone,active,store_id,manager_id")] staffs staffs)
@@ -107,7 +96,6 @@ namespace u22710362_HW03.Controllers
             return View(staffs);
         }
 
-        // GET: staffs/Delete/5
         public async Task<ActionResult> Delete(int? id)
         {
             if (id == null)
@@ -122,7 +110,6 @@ namespace u22710362_HW03.Controllers
             return View(staffs);
         }
 
-        // POST: staffs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)
