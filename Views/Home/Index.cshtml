@@ -782,10 +782,12 @@
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
+                // Try product ID
                 $.each(extensions, function(index, ext) {
                     imagePaths.push('/Images/' + productId + ext);
                 });
 
+                // Try product name (cleaned)
                 if (productName) {
                     var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
                     $.each(extensions, function(index, ext) {
@@ -793,15 +795,12 @@
                     });
                 }
 
+                // Try brand name
                 if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
                         imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
                     });
                 }
-
-                $.each(extensions, function(index, ext) {
-                    imagePaths.push('/Images/{productId}' + ext);
-                });
 
                 tryLoadImage(imagePaths, 0);
             }
