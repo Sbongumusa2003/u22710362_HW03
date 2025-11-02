@@ -527,7 +527,7 @@
             var selectedCustomerId = null;
             var selectedProductId = null;
 
-            // Pagination function
+            // Pagination function using jQuery
             function createPagination(totalItems, currentPage, paginationElementId, onPageChange) {
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
                 var $pagination = $('#' + paginationElementId);
@@ -536,33 +536,35 @@
                 if (totalPages <= 1) return;
 
                 // First button
-                var $first = $('<button>&lt;&lt;</button>');
-                $first.prop('disabled', currentPage === 1);
-                $first.click(function() {
-                    if (currentPage !== 1) {
-                        onPageChange(1);
-                    }
-                });
-                $pagination.append($first);
+                $pagination.append(
+                    $('<button>&lt;&lt;</button>')
+                        .prop('disabled', currentPage === 1)
+                        .on('click', function() {
+                            if (currentPage !== 1) {
+                                onPageChange(1);
+                            }
+                        })
+                );
 
                 // Previous button
-                var $prev = $('<button>&lt;</button>');
-                $prev.prop('disabled', currentPage === 1);
-                $prev.click(function() {
-                    if (currentPage > 1) {
-                        onPageChange(currentPage - 1);
-                    }
-                });
-                $pagination.append($prev);
+                $pagination.append(
+                    $('<button>&lt;</button>')
+                        .prop('disabled', currentPage === 1)
+                        .on('click', function() {
+                            if (currentPage > 1) {
+                                onPageChange(currentPage - 1);
+                            }
+                        })
+                );
 
                 // Page numbers
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, currentPage + 2);
 
                 if (startPage > 1) {
-                    var $page1 = $('<button>1</button>');
-                    $page1.click(function() { onPageChange(1); });
-                    $pagination.append($page1);
+                    $pagination.append(
+                        $('<button>1</button>').on('click', function() { onPageChange(1); })
+                    );
 
                     if (startPage > 2) {
                         $pagination.append($('<button disabled>...</button>'));
@@ -575,7 +577,7 @@
                         $pageBtn.addClass('active');
                     }
                     $pageBtn.data('page', i);
-                    $pageBtn.click(function() {
+                    $pageBtn.on('click', function() {
                         onPageChange($(this).data('page'));
                     });
                     $pagination.append($pageBtn);
@@ -585,30 +587,33 @@
                     if (endPage < totalPages - 1) {
                         $pagination.append($('<button disabled>...</button>'));
                     }
-                    var $pageLast = $('<button>' + totalPages + '</button>');
-                    $pageLast.click(function() { onPageChange(totalPages); });
-                    $pagination.append($pageLast);
+                    $pagination.append(
+                        $('<button>' + totalPages + '</button>')
+                            .on('click', function() { onPageChange(totalPages); })
+                    );
                 }
 
                 // Next button
-                var $next = $('<button>&gt;</button>');
-                $next.prop('disabled', currentPage === totalPages);
-                $next.click(function() {
-                    if (currentPage < totalPages) {
-                        onPageChange(currentPage + 1);
-                    }
-                });
-                $pagination.append($next);
+                $pagination.append(
+                    $('<button>&gt;</button>')
+                        .prop('disabled', currentPage === totalPages)
+                        .on('click', function() {
+                            if (currentPage < totalPages) {
+                                onPageChange(currentPage + 1);
+                            }
+                        })
+                );
 
                 // Last button
-                var $last = $('<button>&gt;&gt;</button>');
-                $last.prop('disabled', currentPage === totalPages);
-                $last.click(function() {
-                    if (currentPage !== totalPages) {
-                        onPageChange(totalPages);
-                    }
-                });
-                $pagination.append($last);
+                $pagination.append(
+                    $('<button>&gt;&gt;</button>')
+                        .prop('disabled', currentPage === totalPages)
+                        .on('click', function() {
+                            if (currentPage !== totalPages) {
+                                onPageChange(totalPages);
+                            }
+                        })
+                );
             }
 
             // Display staff list
@@ -624,10 +629,11 @@
                 if (pageData.length === 0) {
                     $list.append('<li style="text-align: center; color: #999;">No staff found</li>');
                 } else {
-                    pageData.forEach(function(staff) {
-                        var $li = $('<li class="staff-item"></li>');
-                        $li.attr('data-id', staff.staff_id);
-                        $li.text(staff.first_name + ' ' + staff.last_name + ' - ' + staff.store_name);
+                    $.each(pageData, function(index, staff) {
+                        var $li = $('<li class="staff-item"></li>')
+                            .attr('data-id', staff.staff_id)
+                            .text(staff.first_name + ' ' + staff.last_name + ' - ' + staff.store_name);
+
                         if (staff.staff_id === selectedStaffId) {
                             $li.addClass('selected');
                         }
@@ -656,10 +662,11 @@
                 if (pageData.length === 0) {
                     $list.append('<li style="text-align: center; color: #999;">No customers found</li>');
                 } else {
-                    pageData.forEach(function(customer) {
-                        var $li = $('<li class="customer-item"></li>');
-                        $li.attr('data-id', customer.customer_id);
-                        $li.text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
+                    $.each(pageData, function(index, customer) {
+                        var $li = $('<li class="customer-item"></li>')
+                            .attr('data-id', customer.customer_id)
+                            .text(customer.first_name + ' ' + customer.last_name + ' - ' + (customer.city || 'N/A'));
+
                         if (customer.customer_id === selectedCustomerId) {
                             $li.addClass('selected');
                         }
@@ -688,10 +695,11 @@
                 if (pageData.length === 0) {
                     $list.append('<li style="text-align: center; color: #999;">No products found</li>');
                 } else {
-                    pageData.forEach(function(product) {
-                        var $li = $('<li class="product-item"></li>');
-                        $li.attr('data-id', product.product_id);
-                        $li.text(product.product_name + ' - $' + product.list_price.toFixed(2));
+                    $.each(pageData, function(index, product) {
+                        var $li = $('<li class="product-item"></li>')
+                            .attr('data-id', product.product_id)
+                            .text(product.product_name + ' - $' + product.list_price.toFixed(2));
+
                         if (product.product_id === selectedProductId) {
                             $li.addClass('selected');
                         }
@@ -707,14 +715,17 @@
                 attachProductClickHandlers();
             }
 
-            // Attach staff click handlers
+            // Attach staff click handlers using jQuery event delegation
             function attachStaffClickHandlers() {
-                $('.staff-item').click(function () {
+                $('#staffList').off('click', '.staff-item').on('click', '.staff-item', function() {
                     selectedStaffId = $(this).data('id');
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var staff = staffData.find(s => s.staff_id === selectedStaffId);
+                    var staff = $.grep(staffData, function(s) {
+                        return s.staff_id === selectedStaffId;
+                    })[0];
+
                     if (staff) {
                         $('#staff_first_name').val(staff.first_name);
                         $('#staff_last_name').val(staff.last_name);
@@ -725,14 +736,17 @@
                 });
             }
 
-            // Attach customer click handlers
+            // Attach customer click handlers using jQuery event delegation
             function attachCustomerClickHandlers() {
-                $('.customer-item').click(function () {
+                $('#customerList').off('click', '.customer-item').on('click', '.customer-item', function() {
                     selectedCustomerId = $(this).data('id');
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var customer = customerData.find(c => c.customer_id === selectedCustomerId);
+                    var customer = $.grep(customerData, function(c) {
+                        return c.customer_id === selectedCustomerId;
+                    })[0];
+
                     if (customer) {
                         $('#customer_first_name').val(customer.first_name);
                         $('#customer_last_name').val(customer.last_name);
@@ -743,14 +757,17 @@
                 });
             }
 
-            // Attach product click handlers
+            // Attach product click handlers using jQuery event delegation
             function attachProductClickHandlers() {
-                $('.product-item').click(function () {
+                $('#productList').off('click', '.product-item').on('click', '.product-item', function() {
                     selectedProductId = $(this).data('id');
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var product = filteredProductData.find(p => p.product_id === selectedProductId);
+                    var product = $.grep(filteredProductData, function(p) {
+                        return p.product_id === selectedProductId;
+                    })[0];
+
                     if (product) {
                         $('#product_name').text(product.product_name);
                         $('#product_brand').text(product.brand_name);
@@ -763,32 +780,35 @@
                 });
             }
 
-            // Load product image
+            // Load product image using jQuery
             function loadProductImage(productId, brandName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
                 // Try product ID based images first
-                extensions.forEach(function(ext) {
+                $.each(extensions, function(index, ext) {
                     imagePaths.push('~/Content/Images/' + productId + ext);
                 });
 
                 // Try product name variations
-                var product = filteredProductData.find(p => p.product_id === productId);
+                var product = $.grep(filteredProductData, function(p) {
+                    return p.product_id === productId;
+                })[0];
+
                 if (product && product.product_name) {
                     var productNameClean = product.product_name.replace(/[^a-zA-Z0-9]/g, '_');
-                    extensions.forEach(function(ext) {
+                    $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + productNameClean + ext);
                     });
                     var productNameNoSpaces = product.product_name.replace(/\s+/g, '');
-                    extensions.forEach(function(ext) {
+                    $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + productNameNoSpaces + ext);
                     });
                 }
 
                 // Try brand name based images
                 if (brandName) {
-                    extensions.forEach(function(ext) {
+                    $.each(extensions, function(index, ext) {
                         imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '_') + ext);
                         imagePaths.push('~/Content/Images/' + brandName.replace(/\s+/g, '') + ext);
                         imagePaths.push('~/Content/Images/' + brandName.toLowerCase().replace(/\s+/g, '_') + ext);
@@ -796,7 +816,7 @@
                 }
 
                 // Try generic bicycle image
-                extensions.forEach(function(ext) {
+                $.each(extensions, function(index, ext) {
                     imagePaths.push('~/Content/Images/bicycle' + ext);
                     imagePaths.push('~/Content/Images/bike' + ext);
                     imagePaths.push('~/Content/Images/default' + ext);
@@ -805,21 +825,30 @@
                 tryLoadImage(imagePaths, 0);
             }
 
-            // Recursively try to load images
+            // Recursively try to load images using jQuery
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
                     $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
                     return;
                 }
 
-                var img = new Image();
-                img.onload = function() {
-                    $('#productImageContainer').html('<img src="' + paths[index] + '" alt="Product Image" style="max-width: 100%; max-height: 100%; object-fit: contain;" />');
-                };
-                img.onerror = function() {
-                    tryLoadImage(paths, index + 1);
-                };
-                img.src = paths[index];
+                $('<img>')
+                    .on('load', function() {
+                        $('#productImageContainer').html(
+                            $('<img>')
+                                .attr('src', paths[index])
+                                .attr('alt', 'Product Image')
+                                .css({
+                                    'max-width': '100%',
+                                    'max-height': '100%',
+                                    'object-fit': 'contain'
+                                })
+                        );
+                    })
+                    .on('error', function() {
+                        tryLoadImage(paths, index + 1);
+                    })
+                    .attr('src', paths[index]);
             }
 
             // Filter products
@@ -827,7 +856,7 @@
                 var brandId = $('#productBrandFilter').val();
                 var categoryId = $('#productCategoryFilter').val();
 
-                filteredProductData = productData.filter(function(product) {
+                filteredProductData = $.grep(productData, function(product) {
                     var matchBrand = !brandId || product.brand_id == brandId;
                     var matchCategory = !categoryId || product.category_id == categoryId;
                     return matchBrand && matchCategory;
@@ -842,9 +871,9 @@
             displayCustomerList(1);
             displayProductList(1);
 
-            // Create Staff
-            $('#createStaffBtn').click(function() {
-                // Clear form
+            // Create Staff - jQuery event handler
+            $('#createStaffBtn').on('click', function() {
+                // Clear form using jQuery
                 $('#modal_staff_first_name').val('');
                 $('#modal_staff_last_name').val('');
                 $('#modal_staff_email').val('');
@@ -857,10 +886,11 @@
                 staffModal.show();
             });
 
-            $('#saveStaffBtn').click(function() {
-                var firstName = $('#modal_staff_first_name').val().trim();
-                var lastName = $('#modal_staff_last_name').val().trim();
-                var email = $('#modal_staff_email').val().trim();
+            // Save Staff using jQuery AJAX
+            $('#saveStaffBtn').on('click', function() {
+                var firstName = $.trim($('#modal_staff_first_name').val());
+                var lastName = $.trim($('#modal_staff_last_name').val());
+                var email = $.trim($('#modal_staff_email').val());
 
                 if (!firstName || !lastName || !email) {
                     alert('Please fill in all required fields (First Name, Last Name, Email)');
@@ -882,23 +912,25 @@
                     url: '@Url.Action("CreateStaff", "Home")',
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function(response) {
                         if (response.success) {
                             alert(response.message);
-                            location.reload();
+                            window.location.reload();
                         } else {
                             alert(response.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         alert('Error: ' + error);
+                        console.error('AJAX Error:', status, error);
                     }
                 });
             });
 
-            // Create Customer
-            $('#createCustomerBtn').click(function() {
-                // Clear form
+            // Create Customer - jQuery event handler
+            $('#createCustomerBtn').on('click', function() {
+                // Clear form using jQuery
                 $('#modal_customer_first_name').val('');
                 $('#modal_customer_last_name').val('');
                 $('#modal_customer_email').val('');
@@ -912,10 +944,11 @@
                 customerModal.show();
             });
 
-            $('#saveCustomerBtn').click(function() {
-                var firstName = $('#modal_customer_first_name').val().trim();
-                var lastName = $('#modal_customer_last_name').val().trim();
-                var email = $('#modal_customer_email').val().trim();
+            // Save Customer using jQuery AJAX
+            $('#saveCustomerBtn').on('click', function() {
+                var firstName = $.trim($('#modal_customer_first_name').val());
+                var lastName = $.trim($('#modal_customer_last_name').val());
+                var email = $.trim($('#modal_customer_email').val());
 
                 if (!firstName || !lastName || !email) {
                     alert('Please fill in all required fields (First Name, Last Name, Email)');
@@ -938,22 +971,24 @@
                     url: '@Url.Action("CreateCustomer", "Home")',
                     type: 'POST',
                     data: data,
+                    dataType: 'json',
                     success: function(response) {
                         if (response.success) {
                             alert(response.message);
-                            location.reload();
+                            window.location.reload();
                         } else {
                             alert(response.message);
                         }
                     },
                     error: function(xhr, status, error) {
                         alert('Error: ' + error);
+                        console.error('AJAX Error:', status, error);
                     }
                 });
             });
 
-            // Product filtering
-            $('#productBrandFilter, #productCategoryFilter').change(filterProducts);
+            // Product filtering using jQuery event handler
+            $('#productBrandFilter, #productCategoryFilter').on('change', filterProducts);
         });
     </script>
 }
