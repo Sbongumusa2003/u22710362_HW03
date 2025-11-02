@@ -32,6 +32,7 @@ namespace u22710362_HW03.Controllers
             return View(model);
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
         // GET: Maintain/GetStaff/5
         [HttpGet]
         public async Task<ActionResult> GetStaff(int id)
@@ -62,7 +63,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/EditStaff
+        // POST: Maintain/EditStaff - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditStaff([Bind(Include = "staff_id,first_name,last_name,email,phone,active,store_id,manager_id")] staffs staff)
@@ -73,17 +74,22 @@ namespace u22710362_HW03.Controllers
                 {
                     db.Entry(staff).State = EntityState.Modified;
                     await db.SaveChangesAsync();
-                    return Json(new { success = true, message = "Staff updated successfully!" });
+
+                    TempData["SuccessMessage"] = "Staff updated successfully!";
+                    return RedirectToAction("Index");
                 }
-                return Json(new { success = false, message = "Validation failed" });
+
+                TempData["ErrorMessage"] = "Validation failed";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
-        // POST: Maintain/DeleteStaff/5
+        // POST: Maintain/DeleteStaff/5 - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteStaff(int id)
@@ -95,16 +101,22 @@ namespace u22710362_HW03.Controllers
                 {
                     db.staffs.Remove(staff);
                     await db.SaveChangesAsync();
-                    return Json(new { success = true, message = "Staff deleted successfully!" });
+
+                    TempData["SuccessMessage"] = "Staff deleted successfully!";
+                    return RedirectToAction("Index");
                 }
-                return Json(new { success = false, message = "Staff not found" });
+
+                TempData["ErrorMessage"] = "Staff not found";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
         // GET: Maintain/GetCustomer/5
         [HttpGet]
         public async Task<ActionResult> GetCustomer(int id)
@@ -136,7 +148,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/EditCustomer
+        // POST: Maintain/EditCustomer - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditCustomer([Bind(Include = "customer_id,first_name,last_name,phone,email,street,city,state,zip_code")] customers customer)
@@ -147,17 +159,22 @@ namespace u22710362_HW03.Controllers
                 {
                     db.Entry(customer).State = EntityState.Modified;
                     await db.SaveChangesAsync();
-                    return Json(new { success = true, message = "Customer updated successfully!" });
+
+                    TempData["SuccessMessage"] = "Customer updated successfully!";
+                    return RedirectToAction("Index");
                 }
-                return Json(new { success = false, message = "Validation failed" });
+
+                TempData["ErrorMessage"] = "Validation failed";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
-        // POST: Maintain/DeleteCustomer/5
+        // POST: Maintain/DeleteCustomer/5 - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteCustomer(int id)
@@ -169,16 +186,22 @@ namespace u22710362_HW03.Controllers
                 {
                     db.customers.Remove(customer);
                     await db.SaveChangesAsync();
-                    return Json(new { success = true, message = "Customer deleted successfully!" });
+
+                    TempData["SuccessMessage"] = "Customer deleted successfully!";
+                    return RedirectToAction("Index");
                 }
-                return Json(new { success = false, message = "Customer not found" });
+
+                TempData["ErrorMessage"] = "Customer not found";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
         // GET: Maintain/GetProduct/5
         [HttpGet]
         public async Task<ActionResult> GetProduct(int id)
@@ -207,7 +230,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/EditProduct
+        // POST: Maintain/EditProduct - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditProduct([Bind(Include = "product_id,product_name,brand_id,category_id,model_year,list_price")] products product)
@@ -218,17 +241,22 @@ namespace u22710362_HW03.Controllers
                 {
                     db.Entry(product).State = EntityState.Modified;
                     await db.SaveChangesAsync();
-                    return Json(new { success = true, message = "Product updated successfully!" });
+
+                    TempData["SuccessMessage"] = "Product updated successfully!";
+                    return RedirectToAction("Index");
                 }
-                return Json(new { success = false, message = "Validation failed" });
+
+                TempData["ErrorMessage"] = "Validation failed";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
-        // POST: Maintain/DeleteProduct/5
+        // POST: Maintain/DeleteProduct/5 - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteProduct(int id)
@@ -240,13 +268,18 @@ namespace u22710362_HW03.Controllers
                 {
                     db.products.Remove(product);
                     await db.SaveChangesAsync();
-                    return Json(new { success = true, message = "Product deleted successfully!" });
+
+                    TempData["SuccessMessage"] = "Product deleted successfully!";
+                    return RedirectToAction("Index");
                 }
-                return Json(new { success = false, message = "Product not found" });
+
+                TempData["ErrorMessage"] = "Product not found";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error: " + ex.Message });
+                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 

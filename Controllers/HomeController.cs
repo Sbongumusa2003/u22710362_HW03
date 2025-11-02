@@ -53,7 +53,7 @@ namespace u22710362_HW03.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error (you can use a logging framework)
+                // Log the error
                 ViewBag.ErrorMessage = "Error loading data: " + ex.Message;
                 return View(new HomeViewModel
                 {
@@ -64,7 +64,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Home/CreateStaff
+        // POST: Home/CreateStaff - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateStaff([Bind(Include = "first_name,last_name,email,phone,active,store_id,manager_id")] staffs staff)
@@ -77,7 +77,8 @@ namespace u22710362_HW03.Controllers
                     var storeExists = await db.stores.AnyAsync(s => s.store_id == staff.store_id);
                     if (!storeExists)
                     {
-                        return Json(new { success = false, message = "Invalid store selected" });
+                        TempData["ErrorMessage"] = "Invalid store selected";
+                        return RedirectToAction("Index");
                     }
 
                     // Validate manager if provided
@@ -86,7 +87,8 @@ namespace u22710362_HW03.Controllers
                         var managerExists = await db.staffs.AnyAsync(s => s.staff_id == staff.manager_id.Value);
                         if (!managerExists)
                         {
-                            return Json(new { success = false, message = "Invalid manager selected" });
+                            TempData["ErrorMessage"] = "Invalid manager selected";
+                            return RedirectToAction("Index");
                         }
                     }
 
@@ -94,7 +96,8 @@ namespace u22710362_HW03.Controllers
                     db.staffs.Add(staff);
                     await db.SaveChangesAsync();
 
-                    return Json(new { success = true, message = "Staff member created successfully!" });
+                    TempData["SuccessMessage"] = "Staff member created successfully!";
+                    return RedirectToAction("Index");
                 }
 
                 // Collect validation errors
@@ -103,23 +106,17 @@ namespace u22710362_HW03.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList();
 
-                return Json(new
-                {
-                    success = false,
-                    message = "Validation failed: " + string.Join(", ", errors)
-                });
+                TempData["ErrorMessage"] = "Validation failed: " + string.Join(", ", errors);
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error creating staff: " + ex.Message
-                });
+                TempData["ErrorMessage"] = "Error creating staff: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
-        // POST: Home/CreateCustomer
+        // POST: Home/CreateCustomer - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> CreateCustomer([Bind(Include = "first_name,last_name,phone,email,street,city,state,zip_code")] customers customer)
@@ -131,14 +128,16 @@ namespace u22710362_HW03.Controllers
                     // Validate email format (basic check)
                     if (!string.IsNullOrEmpty(customer.email) && !customer.email.Contains("@"))
                     {
-                        return Json(new { success = false, message = "Invalid email format" });
+                        TempData["ErrorMessage"] = "Invalid email format";
+                        return RedirectToAction("Index");
                     }
 
                     // Add customer to database
                     db.customers.Add(customer);
                     await db.SaveChangesAsync();
 
-                    return Json(new { success = true, message = "Customer created successfully!" });
+                    TempData["SuccessMessage"] = "Customer created successfully!";
+                    return RedirectToAction("Index");
                 }
 
                 // Collect validation errors
@@ -147,22 +146,17 @@ namespace u22710362_HW03.Controllers
                     .Select(e => e.ErrorMessage)
                     .ToList();
 
-                return Json(new
-                {
-                    success = false,
-                    message = "Validation failed: " + string.Join(", ", errors)
-                });
+                TempData["ErrorMessage"] = "Validation failed: " + string.Join(", ", errors);
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error creating customer: " + ex.Message
-                });
+                TempData["ErrorMessage"] = "Error creating customer: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
         // GET: Home/FilterProducts
         [HttpGet]
         public async Task<ActionResult> FilterProducts(int? brandId, int? categoryId)
@@ -219,6 +213,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
         // GET: Home/GetStaffOrders/{staffId}
         [HttpGet]
         public async Task<ActionResult> GetStaffOrders(int staffId)
@@ -255,6 +250,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
         // GET: Home/GetCustomerOrders/{customerId}
         [HttpGet]
         public async Task<ActionResult> GetCustomerOrders(int customerId)
@@ -291,6 +287,7 @@ namespace u22710362_HW03.Controllers
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Can be removed if not used elsewhere
         // GET: Home/GetProductDetails/{productId}
         [HttpGet]
         public async Task<ActionResult> GetProductDetails(int productId)

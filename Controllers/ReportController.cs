@@ -62,7 +62,7 @@ namespace u22710362_HW03.Controllers
                 var filesPath = Server.MapPath("~/Reports");
                 if (!Directory.Exists(filesPath))
                 {
-                    Directory.CreateDirectory(filesPath);
+                    Directory.CreateDirectory();
                 }
 
                 var files = Directory.GetFiles(filesPath)
@@ -91,8 +91,9 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Report/SaveReport
+        // POST: Report/SaveReport - FIXED: Returns redirect instead of JSON
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult SaveReport(string fileName, string fileType, string reportHtml, string description)
         {
             try
@@ -140,11 +141,13 @@ namespace u22710362_HW03.Controllers
                     System.IO.File.WriteAllText(descriptionPath, description);
                 }
 
-                return Json(new { success = true, message = "Report saved successfully!" });
+                TempData["SuccessMessage"] = "Report saved successfully!";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error saving report: " + ex.Message });
+                TempData["ErrorMessage"] = "Error saving report: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
@@ -171,8 +174,9 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Report/DeleteFile
+        // POST: Report/DeleteFile - FIXED: Returns redirect instead of JSON
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult DeleteFile(string fileName)
         {
             try
@@ -191,17 +195,21 @@ namespace u22710362_HW03.Controllers
                         System.IO.File.Delete(descriptionPath);
                     }
 
-                    return Json(new { success = true, message = "File deleted successfully!" });
+                    TempData["SuccessMessage"] = "File deleted successfully!";
+                    return RedirectToAction("Index");
                 }
 
-                return Json(new { success = false, message = "File not found" });
+                TempData["ErrorMessage"] = "File not found";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = "Error deleting file: " + ex.Message });
+                TempData["ErrorMessage"] = "Error deleting file: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
+        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
         // GET: Report/GetFileDescription
         [HttpGet]
         public ActionResult GetFileDescription(string fileName)
