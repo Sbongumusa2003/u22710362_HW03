@@ -487,7 +487,6 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            // Initialize data arrays from server (NO AJAX - data embedded at page load)
             var staffData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
                 Model.Staffs.Select(s => new {
                     staff_id = s.staff_id,
@@ -781,21 +780,9 @@
             function loadProductImage(productId, brandName, productName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
-
-                // Try product ID
                 $.each(extensions, function(index, ext) {
                     imagePaths.push('/Images/' + productId + ext);
                 });
-
-                // Try product name (cleaned)
-                if (productName) {
-                    var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
-                    $.each(extensions, function(index, ext) {
-                        imagePaths.push('/Images/' + productNameClean + ext);
-                    });
-                }
-
-                // Try brand name
                 if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
                         imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
