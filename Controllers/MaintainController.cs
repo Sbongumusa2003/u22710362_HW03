@@ -14,7 +14,6 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        // GET: Maintain
         public async Task<ActionResult> Index()
         {
             ViewBag.Brands = await db.brands.ToListAsync();
@@ -32,8 +31,6 @@ namespace u22710362_HW03.Controllers
             return View(model);
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
-        // GET: Maintain/GetStaff/5
         [HttpGet]
         public async Task<ActionResult> GetStaff(int id)
         {
@@ -63,7 +60,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/EditStaff - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditStaff([Bind(Include = "staff_id,first_name,last_name,email,phone,active,store_id,manager_id")] staffs staff)
@@ -89,7 +85,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/DeleteStaff/5 - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteStaff(int id)
@@ -116,8 +111,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
-        // GET: Maintain/GetCustomer/5
         [HttpGet]
         public async Task<ActionResult> GetCustomer(int id)
         {
@@ -148,7 +141,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/EditCustomer - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditCustomer([Bind(Include = "customer_id,first_name,last_name,phone,email,street,city,state,zip_code")] customers customer)
@@ -174,7 +166,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/DeleteCustomer/5 - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteCustomer(int id)
@@ -201,8 +192,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // KEPT FOR BACKWARD COMPATIBILITY - Returns JSON
-        // GET: Maintain/GetProduct/5
         [HttpGet]
         public async Task<ActionResult> GetProduct(int id)
         {
@@ -230,7 +219,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/EditProduct - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> EditProduct([Bind(Include = "product_id,product_name,brand_id,category_id,model_year,list_price")] products product)
@@ -256,7 +244,6 @@ namespace u22710362_HW03.Controllers
             }
         }
 
-        // POST: Maintain/DeleteProduct/5 - FIXED: Returns redirect instead of JSON
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteProduct(int id)
