@@ -257,7 +257,6 @@
             </div>
         </div>
 
-        <!-- Customers Section -->
         <div class="section-box">
             <h4>Customers</h4>
 
@@ -294,7 +293,6 @@
             </div>
         </div>
 
-        <!-- Products Section -->
         <div class="section-box">
             <h4>Products</h4>
 
@@ -363,7 +361,6 @@
     </div>
 </div>
 
-<!-- Modal for Staff Creation -->
 <div class="modal fade" id="staffModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -548,7 +545,6 @@
 
                 if (totalPages <= 1) return;
 
-                // First button
                 $pagination.append(
                     $('<button>&lt;&lt;</button>')
                         .prop('disabled', currentPage === 1)
@@ -558,8 +554,6 @@
                             }
                         })
                 );
-
-                // Previous button
                 $pagination.append(
                     $('<button>&lt;</button>')
                         .prop('disabled', currentPage === 1)
@@ -570,7 +564,6 @@
                         })
                 );
 
-                // Page numbers
                 var startPage = Math.max(1, currentPage - 2);
                 var endPage = Math.min(totalPages, currentPage + 2);
 
@@ -606,7 +599,6 @@
                     );
                 }
 
-                // Next button
                 $pagination.append(
                     $('<button>&gt;</button>')
                         .prop('disabled', currentPage === totalPages)
@@ -617,7 +609,6 @@
                         })
                 );
 
-                // Last button
                 $pagination.append(
                     $('<button>&gt;&gt;</button>')
                         .prop('disabled', currentPage === totalPages)
@@ -629,7 +620,6 @@
                 );
             }
 
-            // PURE JQUERY - Display staff list
             function displayStaffList(page) {
                 staffCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -662,7 +652,6 @@
                 attachStaffClickHandlers();
             }
 
-            // PURE JQUERY - Display customer list
             function displayCustomerList(page) {
                 customerCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -695,7 +684,6 @@
                 attachCustomerClickHandlers();
             }
 
-            // PURE JQUERY - Display product list
             function displayProductList(page) {
                 productCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
@@ -728,14 +716,12 @@
                 attachProductClickHandlers();
             }
 
-            // PURE JQUERY - Attach staff click handlers (NO AJAX - uses local data)
             function attachStaffClickHandlers() {
                 $('#staffList').off('click', '.staff-item').on('click', '.staff-item', function() {
                     selectedStaffId = $(this).data('id');
                     $('.staff-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    // Find staff in local data array (NO AJAX)
                     var staff = $.grep(staffData, function(s) {
                         return s.staff_id === selectedStaffId;
                     })[0];
@@ -750,14 +736,12 @@
                 });
             }
 
-            // PURE JQUERY - Attach customer click handlers (NO AJAX - uses local data)
             function attachCustomerClickHandlers() {
                 $('#customerList').off('click', '.customer-item').on('click', '.customer-item', function() {
                     selectedCustomerId = $(this).data('id');
                     $('.customer-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    // Find customer in local data array (NO AJAX)
                     var customer = $.grep(customerData, function(c) {
                         return c.customer_id === selectedCustomerId;
                     })[0];
@@ -772,14 +756,12 @@
                 });
             }
 
-            // PURE JQUERY - Attach product click handlers (NO AJAX - uses local data)
             function attachProductClickHandlers() {
                 $('#productList').off('click', '.product-item').on('click', '.product-item', function() {
                     selectedProductId = $(this).data('id');
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    // Find product in local data array (NO AJAX)
                     var product = $.grep(filteredProductData, function(p) {
                         return p.product_id === selectedProductId;
                     })[0];
@@ -796,36 +778,34 @@
                 });
             }
 
-            // PURE JQUERY - Load product image (FIXED PATH)
             function loadProductImage(productId, brandName, productName) {
                 var extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
                 var imagePaths = [];
 
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('~/Images/' + productId + ext);
+                    imagePaths.push('/Images/' + productId + ext);
                 });
 
                 if (productName) {
                     var productNameClean = productName.replace(/[^a-zA-Z0-9]/g, '_');
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Images/' + productNameClean + ext);
+                        imagePaths.push('/Images/' + productNameClean + ext);
                     });
                 }
 
                 if (brandName && brandName !== 'N/A') {
                     $.each(extensions, function(index, ext) {
-                        imagePaths.push('~/Images/' + brandName.replace(/\s+/g, '_') + ext);
+                        imagePaths.push('/Images/' + brandName.replace(/\s+/g, '_') + ext);
                     });
                 }
 
                 $.each(extensions, function(index, ext) {
-                    imagePaths.push('~/Images/{productId}' + ext);
+                    imagePaths.push('/Images/{productId}' + ext);
                 });
 
                 tryLoadImage(imagePaths, 0);
             }
 
-            // PURE JQUERY - Recursively try to load images
             function tryLoadImage(paths, index) {
                 if (index >= paths.length) {
                     $('#productImageContainer').html('<span class="placeholder-text">No image available</span>');
@@ -851,7 +831,6 @@
                     .attr('src', paths[index]);
             }
 
-            // PURE JQUERY - Filter products (NO AJAX - filters local data)
             function filterProducts() {
                 var brandId = $('#productBrandFilter').val();
                 var categoryId = $('#productCategoryFilter').val();
@@ -866,14 +845,11 @@
                 displayProductList(1);
             }
 
-            // Initialize lists
             displayStaffList(1);
             displayCustomerList(1);
             displayProductList(1);
 
-            // PURE JQUERY - Create Staff button (opens modal)
             $('#createStaffBtn').on('click', function() {
-                // Clear form using jQuery
                 $('#modal_staff_first_name').val('');
                 $('#modal_staff_last_name').val('');
                 $('#modal_staff_email').val('');
@@ -886,7 +862,6 @@
                 staffModal.show();
             });
 
-            // PURE JQUERY - Validate staff form before submission (NO AJAX)
             $('#staffForm').on('submit', function(e) {
                 var firstName = $.trim($('#modal_staff_first_name').val());
                 var lastName = $.trim($('#modal_staff_last_name').val());
@@ -898,13 +873,10 @@
                     return false;
                 }
 
-                // Form will submit normally (traditional POST)
                 return true;
             });
 
-            // PURE JQUERY - Create Customer button (opens modal)
             $('#createCustomerBtn').on('click', function() {
-                // Clear form using jQuery
                 $('#modal_customer_first_name').val('');
                 $('#modal_customer_last_name').val('');
                 $('#modal_customer_email').val('');
@@ -918,7 +890,6 @@
                 customerModal.show();
             });
 
-            // PURE JQUERY - Validate customer form before submission (NO AJAX)
             $('#customerForm').on('submit', function(e) {
                 var firstName = $.trim($('#modal_customer_first_name').val());
                 var lastName = $.trim($('#modal_customer_last_name').val());
@@ -930,11 +901,9 @@
                     return false;
                 }
 
-                // Form will submit normally (traditional POST)
                 return true;
             });
 
-            // PURE JQUERY - Product filtering event handler
             $('#productBrandFilter, #productCategoryFilter').on('change', filterProducts);
         });
     </script>
