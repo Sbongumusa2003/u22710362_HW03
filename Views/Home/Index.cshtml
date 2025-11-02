@@ -805,8 +805,6 @@
             });
 
             $('#productBrandFilter, #productCategoryFilter').on('change', filterProducts);
-
-            // Enhanced form validation
             $('form').on('submit', function() {
                 var $form = $(this);
                 var isValid = true;
@@ -824,8 +822,6 @@
                     alert('Please fill in all required fields.');
                     return false;
                 }
-
-                // Show loading overlay
                 $('#loadingOverlay').addClass('active');
             });
         });
