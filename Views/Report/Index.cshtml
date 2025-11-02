@@ -236,7 +236,6 @@
             </div>
         </div>
 
-        <!-- PDF Actions - Buttons in a row -->
         <div class="pdf-actions">
             <button type="button" id="openPdfBtn" class="btn btn-info">
                 <i class="glyphicon glyphicon-eye-open"></i> Open PDF
@@ -250,14 +249,9 @@
         </div>
 
 @section Scripts {
-    <!-- Chart.js CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-
-    <!-- pdfMake CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-
-    <!-- Summernote WYSIWYG Editor -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.js"></script>
 
@@ -287,7 +281,6 @@
                 return;
             }
 
-            // Initialize Summernote editor
             try {
                 $('#descriptionEditor').summernote({
                     height: 200,
@@ -303,14 +296,11 @@
                 console.log('Summernote initialized successfully');
             } catch (error) {
                 console.error('Error initializing Summernote:', error);
-                // Fallback to textarea if Summernote fails
                 $('#descriptionEditor').html('<textarea id="descriptionTextarea" class="form-control" rows="5" placeholder="Enter description for this report..."></textarea>');
             }
 
-            // Set report date
             $('#reportDate').text(new Date().toLocaleString());
 
-            // Calculate statistics
             var totalOrders = 0;
             $.each(reportData, function(index, item) {
                 totalOrders += item.Value;
@@ -319,8 +309,6 @@
 
             $('#totalOrdersValue').text(totalOrders);
             $('#avgOrdersValue').text(avgOrders);
-
-            // Populate table
             var $tableBody = $('#reportTableBody');
             $tableBody.empty();
 
@@ -334,7 +322,6 @@
                 $tableBody.append($row);
             });
 
-            // Create Chart
             var ctx = $('#reportChart');
             if (ctx.length > 0) {
                 ctx = ctx[0].getContext('2d');
@@ -424,8 +411,6 @@
                     }
                 });
             }
-
-            // PDF Functions
             function getPdfDocDef() {
                 var tableBody = [
                     [
@@ -600,8 +585,6 @@
                     alert('Error downloading PDF: ' + error.message);
                 }
             });
-
-            // Save Report form submission
             $('#saveReportForm').on('submit', function(e) {
                 try {
                     var fileName = $.trim($('#reportFileName').val());
@@ -610,8 +593,6 @@
                     }
 
                     var description = $('#descriptionEditor').summernote('code');
-
-                    // Build HTML report
                     var reportHtml = '<!DOCTYPE html><html><head><title>' + fileName + '</title>';
                     reportHtml += '<meta charset="utf-8">';
                     reportHtml += '<style>body{font-family:Arial,sans-serif;margin:20px;line-height:1.6;}';
@@ -642,8 +623,6 @@
                     });
 
                     reportHtml += '</tbody></table></body></html>';
-
-                    // Set the hidden input values
                     $('#reportHtmlInput').val(reportHtml);
                     $('#descriptionInput').val(description);
 
@@ -653,8 +632,6 @@
                         htmlLength: reportHtml.length,
                         descLength: description.length
                     });
-
-                    // Allow form to submit
                     return true;
                 } catch (error) {
                     console.error('Error preparing report:', error);
@@ -662,8 +639,6 @@
                     return false;
                 }
             });
-
-            // View Description
             $(document).on('click', '.view-description', function() {
                 var fileName = $(this).data('filename');
                 var $item = $(this).closest('.archive-item');
