@@ -247,29 +247,107 @@
             </button>
         </div>
 
+        <!-- Save Report Section -->
+        <div class="description-editor">
+            <h4>Save Report</h4>
+            @using (Html.BeginForm("SaveReport", "Report", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="reportHtml" id="reportHtmlInput" />
+                <input type="hidden" name="description" id="descriptionInput" />
+
+                <div class="save-options">
+                    <div>
+                        <label for="reportFileName">File Name:</label>
+                        <input type="text" class="form-control" id="reportFileName" name="fileName" placeholder="Report" style="width: 200px;" />
+                    </div>
+                    <div>
+                        <label for="reportFileType">Format:</label>
+                        <select class="form-select" id="reportFileType" name="fileType" style="width: 120px;">
+                            <option value="html">HTML</option>
+                            <option value="txt">Text</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="saveReportBtn">
+                        <i class="glyphicon glyphicon-floppy-disk"></i> Save Report
+                    </button>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <label for="descriptionEditor">Description (Optional):</label>
+                    <textarea class="form-control" id="descriptionEditor" rows="5" placeholder="Enter description for this report..."></textarea>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Archive Section -->
+    <div class="archive-section">
+        <h3>Saved Reports Archive</h3>
+        <div class="archive-list">
+            @if (ViewBag.SavedFiles != null && ((List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles).Count > 0)
+            {
+                foreach (var file in (List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles)
+                {
+                    var descPath = file.FilePath + ".description.txt";
+                    var hasDescription = System.IO.File.Exists(descPath);
+                    var description = hasDescription ? System.IO.File.ReadAllText(descPath) : "";
+
+                    <div class="archive-item" data-filename="@file.FileName">
+                        <div class="archive-item-header">
+                            <div>
+                                <strong>@file.FileName</strong>
+                                <br />
+                                <small class="text-muted">
+                                    Created: @file.CreatedDate.ToString("yyyy-MM-dd HH:mm:ss") |
+                                    Size: @(file.FileSize / 1024.0).ToString("F2") KB
+                                </small>
+                            </div>
+                            <div class="archive-item-actions">
+                                @if (hasDescription && !string.IsNullOrWhiteSpace(description))
+                                {
+                                    <button type="button" class="btn btn-sm btn-info view-description">
+                                        <i class="glyphicon glyphicon-info-sign"></i> Description
+                                    </button>
+                                }
+                                <a href="@Url.Action("DownloadFile", "Report", new { fileName = file.FileName })" class="btn btn-sm btn-success">
+                                    <i class="glyphicon glyphicon-download"></i> Download
+                                </a>
+                                @using (Html.BeginForm("DeleteFile", "Report", FormMethod.Post, new { style = "display:inline;" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="fileName" value="@file.FileName" />
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this file?');">
+                                        <i class="glyphicon glyphicon-trash"></i> Delete
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                        @if (hasDescription && !string.IsNullOrWhiteSpace(description))
+                        {
+                            <div class="archive-item-description" style="display:none;">
+                                @Html.Raw(description)
+                            </div>
+                        }
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="text-center text-muted">No saved reports yet. Save a report to see it here.</p>
+            }
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.18/summernote.min.js"></script>
 
     <script>
         var reportData = @Html.Raw(ViewBag.ReportData ?? "[]");
         var reportChart = null;
-
-        var fileDescriptions = {
-            @if (ViewBag.SavedFiles != null)
-            {
-                var files = (List<u22710362_HW03.Models.SavedFileInfo>)ViewBag.SavedFiles;
-                for (int i = 0; i < files.Count; i++)
-                {
-                    var descPath = files[i].FilePath + ".description.txt";
-                    var desc = System.IO.File.Exists(descPath) ? System.IO.File.ReadAllText(descPath) : "";
-                    @: "@Html.Raw(files[i].FileName)": "@Html.Raw(HttpUtility.JavaScriptStringEncode(desc))"@(i < files.Count - 1 ? "," : "")
-                }
-            }
-        };
 
         $(document).ready(function () {
             console.log("Report data:", reportData);
@@ -278,24 +356,6 @@
                 $('#reportContent').html('<div class="alert alert-warning">No report data available. Please ensure there are orders in the database with order items.</div>');
                 $('.pdf-actions, .save-options, .description-editor').hide();
                 return;
-            }
-
-            try {
-                $('#descriptionEditor').summernote({
-                    height: 200,
-                    placeholder: 'Enter description for this report...',
-                    toolbar: [
-                        ['style', ['bold', 'italic', 'underline', 'clear']],
-                        ['font', ['strikethrough', 'superscript', 'subscript']],
-                        ['para', ['ul', 'ol', 'paragraph']],
-                        ['insert', ['link']],
-                        ['view', ['fullscreen', 'codeview', 'help']]
-                    ]
-                });
-                console.log('Summernote initialized successfully');
-            } catch (error) {
-                console.error('Error initializing Summernote:', error);
-                $('#descriptionEditor').html('<textarea id="descriptionTextarea" class="form-control" rows="5" placeholder="Enter description for this report..."></textarea>');
             }
 
             $('#reportDate').text(new Date().toLocaleString());
@@ -308,6 +368,7 @@
 
             $('#totalOrdersValue').text(totalOrders);
             $('#avgOrdersValue').text(avgOrders);
+
             var $tableBody = $('#reportTableBody');
             $tableBody.empty();
 
@@ -410,6 +471,7 @@
                     }
                 });
             }
+
             function getPdfDocDef() {
                 var tableBody = [
                     [
@@ -555,6 +617,7 @@
 
                 return docDefinition;
             }
+
             $('#openPdfBtn').on('click', function() {
                 try {
                     pdfMake.createPdf(getPdfDocDef()).open();
@@ -582,14 +645,16 @@
                     alert('Error downloading PDF: ' + error.message);
                 }
             });
-            $('#saveReportForm').on('submit', function(e) {
+
+            $('form[action*="SaveReport"]').on('submit', function(e) {
                 try {
                     var fileName = $.trim($('#reportFileName').val());
                     if (!fileName) {
                         fileName = 'Report';
                     }
 
-                    var description = $('#descriptionEditor').summernote('code');
+                    var description = $('#descriptionEditor').val() || '';
+
                     var reportHtml = '<!DOCTYPE html><html><head><title>' + fileName + '</title>';
                     reportHtml += '<meta charset="utf-8">';
                     reportHtml += '<style>body{font-family:Arial,sans-serif;margin:20px;line-height:1.6;}';
@@ -620,6 +685,7 @@
                     });
 
                     reportHtml += '</tbody></table></body></html>';
+
                     $('#reportHtmlInput').val(reportHtml);
                     $('#descriptionInput').val(description);
 
@@ -629,6 +695,7 @@
                         htmlLength: reportHtml.length,
                         descLength: description.length
                     });
+
                     return true;
                 } catch (error) {
                     console.error('Error preparing report:', error);
@@ -636,21 +703,18 @@
                     return false;
                 }
             });
+
+            // Description toggle
             $(document).on('click', '.view-description', function() {
-                var fileName = $(this).data('filename');
                 var $item = $(this).closest('.archive-item');
                 var $descDiv = $item.find('.archive-item-description');
 
                 if ($descDiv.is(':visible')) {
                     $descDiv.slideUp();
+                    $(this).html('<i class="glyphicon glyphicon-info-sign"></i> Description');
                 } else {
-                    var description = fileDescriptions[fileName] || '';
-
-                    if (description && description.trim() !== '') {
-                        $descDiv.html(description).slideDown();
-                    } else {
-                        $descDiv.html('<em>No description available</em>').slideDown();
-                    }
+                    $descDiv.slideDown();
+                    $(this).html('<i class="glyphicon glyphicon-info-sign"></i> Hide Description');
                 }
             });
         });

@@ -59,7 +59,7 @@ namespace u22710362_HW03.Controllers
                 var filesPath = Server.MapPath("~/Reports");
                 if (!Directory.Exists(filesPath))
                 {
-                    Directory.CreateDirectory(filesPath); 
+                    Directory.CreateDirectory(filesPath);
                 }
 
                 var files = Directory.GetFiles(filesPath)
@@ -90,6 +90,7 @@ namespace u22710362_HW03.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [ValidateInput(false)]
         public ActionResult SaveReport(string fileName, string fileType, string reportHtml, string description)
         {
             try
@@ -106,6 +107,7 @@ namespace u22710362_HW03.Controllers
                     fileName = "Report";
                 }
 
+                // Remove invalid filename characters
                 foreach (char c in Path.GetInvalidFileNameChars())
                 {
                     fileName = fileName.Replace(c, '_');
@@ -127,6 +129,7 @@ namespace u22710362_HW03.Controllers
                     System.IO.File.WriteAllText(filePath, plainText);
                 }
 
+                // Save description if provided
                 if (!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
                 {
                     var descriptionPath = Path.Combine(filesPath, fullFileName + ".description.txt");
@@ -178,6 +181,7 @@ namespace u22710362_HW03.Controllers
                 {
                     System.IO.File.Delete(filePath);
 
+                    // Delete description file if exists
                     var descriptionPath = filePath + ".description.txt";
                     if (System.IO.File.Exists(descriptionPath))
                     {
