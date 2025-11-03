@@ -308,29 +308,35 @@
             <div class="product-section">
                 <div class="product-left">
                     <div class="product-details">
-                        <div class="filter-section">
-                            <label style="font-weight: bold;">Filter:</label>
-                            <select class="form-select form-select-sm" id="productBrandFilter" style="width: 150px;">
-                                <option value="">All Brands</option>
-                                @if (ViewBag.Brands != null)
-                                {
-                                    foreach (var brand in ViewBag.Brands)
+                        @using (Html.BeginForm("Index", "Home", FormMethod.Get))
+                        {
+                            <div class="filter-section">
+                                <label style="font-weight: bold;">Filter:</label>
+                                <select class="form-select form-select-sm" name="brandFilter" id="productBrandFilter" style="width: 150px;">
+                                    <option value="">All Brands</option>
+                                    @if (ViewBag.Brands != null)
                                     {
-                                        <option value="@brand.brand_id">@brand.brand_name</option>
+                                        foreach (var brand in ViewBag.Brands)
+                                        {
+                                            var selected = ViewBag.BrandFilter != null && ViewBag.BrandFilter == brand.brand_id ? "selected" : "";
+                                            <option value="@brand.brand_id" @selected>@brand.brand_name</option>
+                                        }
                                     }
-                                }
-                            </select>
-                            <select class="form-select form-select-sm" id="productCategoryFilter" style="width: 150px;">
-                                <option value="">All Categories</option>
-                                @if (ViewBag.Categories != null)
-                                {
-                                    foreach (var category in ViewBag.Categories)
+                                </select>
+                                <select class="form-select form-select-sm" name="categoryFilter" id="productCategoryFilter" style="width: 150px;">
+                                    <option value="">All Categories</option>
+                                    @if (ViewBag.Categories != null)
                                     {
-                                        <option value="@category.category_id">@category.category_name</option>
+                                        foreach (var category in ViewBag.Categories)
+                                        {
+                                            var selected = ViewBag.CategoryFilter != null && ViewBag.CategoryFilter == category.category_id ? "selected" : "";
+                                            <option value="@category.category_id" @selected>@category.category_name</option>
+                                        }
                                     }
-                                }
-                            </select>
-                        </div>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Apply Filter</button>
+                            </div>
+                        }
 
                         <div class="product-info-row">
                             <label>Product Name:</label>
@@ -537,7 +543,6 @@
                 }).ToList()
             ));
 
-            var filteredProductData = productData;
             var itemsPerPage = 10;
             var staffCurrentPage = 1;
             var customerCurrentPage = 1;
@@ -665,7 +670,7 @@
                 productCurrentPage = page;
                 var start = (page - 1) * itemsPerPage;
                 var end = start + itemsPerPage;
-                var pageData = filteredProductData.slice(start, end);
+                var pageData = productData.slice(start, end);
 
                 var $list = $('#productList');
                 $list.empty();
@@ -683,8 +688,8 @@
                     });
                 }
 
-                createPagination(filteredProductData.length, page, 'productPagination', displayProductList);
-                var totalPages = Math.ceil(filteredProductData.length / itemsPerPage);
+                createPagination(productData.length, page, 'productPagination', displayProductList);
+                var totalPages = Math.ceil(productData.length / itemsPerPage);
                 $('#productPageInfo').text('Page ' + page + ' of ' + totalPages);
                 attachProductClickHandlers();
             }
@@ -731,7 +736,7 @@
                     $('.product-item').removeClass('selected');
                     $(this).addClass('selected');
 
-                    var product = $.grep(filteredProductData, function(p) { return p.product_id === selectedProductId; })[0];
+                    var product = $.grep(productData, function(p) { return p.product_id === selectedProductId; })[0];
 
                     if (product) {
                         $('#product_name').text(product.product_name);
@@ -776,20 +781,6 @@
                     .attr('src', paths[index]);
             }
 
-            function filterProducts() {
-                var brandId = $('#productBrandFilter').val();
-                var categoryId = $('#productCategoryFilter').val();
-
-                filteredProductData = $.grep(productData, function(product) {
-                    var matchBrand = !brandId || product.brand_id == brandId;
-                    var matchCategory = !categoryId || product.category_id == categoryId;
-                    return matchBrand && matchCategory;
-                });
-
-                productCurrentPage = 1;
-                displayProductList(1);
-            }
-
             displayStaffList(1);
             displayCustomerList(1);
             displayProductList(1);
@@ -804,7 +795,6 @@
                 customerModal.show();
             });
 
-            $('#productBrandFilter, #productCategoryFilter').on('change', filterProducts);
             $('form').on('submit', function() {
                 var $form = $(this);
                 var isValid = true;
@@ -822,7 +812,6 @@
                     alert('Please fill in all required fields.');
                     return false;
                 }
-                $('#loadingOverlay').addClass('active');
             });
         });
     </script>

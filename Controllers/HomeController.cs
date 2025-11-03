@@ -14,13 +14,35 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        public async Task<ActionResult> Index()
+        // GET: Home/Index with optional filters
+        public async Task<ActionResult> Index(int? brandFilter, int? categoryFilter)
         {
             try
             {
                 ViewBag.Brands = await db.brands.OrderBy(b => b.brand_name).ToListAsync();
                 ViewBag.Categories = await db.categories.OrderBy(c => c.category_name).ToListAsync();
                 ViewBag.Stores = await db.stores.OrderBy(s => s.store_name).ToListAsync();
+
+                // Store current filter values
+                ViewBag.BrandFilter = brandFilter;
+                ViewBag.CategoryFilter = categoryFilter;
+
+                // Build products query with filters
+                var productsQuery = db.products
+                    .Include(p => p.brands)
+                    .Include(p => p.categories)
+                    .AsQueryable();
+
+                if (brandFilter.HasValue && brandFilter.Value > 0)
+                {
+                    productsQuery = productsQuery.Where(p => p.brand_id == brandFilter.Value);
+                }
+
+                if (categoryFilter.HasValue && categoryFilter.Value > 0)
+                {
+                    productsQuery = productsQuery.Where(p => p.category_id == categoryFilter.Value);
+                }
+
                 var model = new HomeViewModel
                 {
                     Staffs = await db.staffs
@@ -33,9 +55,7 @@ namespace u22710362_HW03.Controllers
                         .OrderBy(c => c.last_name)
                         .ThenBy(c => c.first_name)
                         .ToListAsync(),
-                    Products = await db.products
-                        .Include(p => p.brands)
-                        .Include(p => p.categories)
+                    Products = await productsQuery
                         .OrderBy(p => p.product_name)
                         .ToListAsync()
                 };
@@ -130,179 +150,6 @@ namespace u22710362_HW03.Controllers
             {
                 TempData["ErrorMessage"] = "Error creating customer: " + ex.Message;
                 return RedirectToAction("Index");
-            }
-        }
-
-
-        [HttpGet]
-        public async Task<ActionResult> FilterProducts(int? brandId, int? categoryId)
-        {
-            try
-            {
-
-                var products = db.products
-                    .Include(p => p.brands)
-                    .Include(p => p.categories)
-                    .AsQueryable();
-
-   
-                if (brandId.HasValue && brandId.Value > 0)
-                {
-                    products = products.Where(p => p.brand_id == brandId.Value);
-                }
-                if (categoryId.HasValue && categoryId.Value > 0)
-                {
-                    products = products.Where(p => p.category_id == categoryId.Value);
-                }
-
-                products = products.OrderBy(p => p.product_name);
-
-                
-                var result = await products.Select(p => new
-                {
-                    product_id = p.product_id,
-                    product_name = p.product_name,
-                    brand_name = p.brands.brand_name,
-                    brand_id = p.brand_id,
-                    category_name = p.categories.category_name,
-                    category_id = p.category_id,
-                    model_year = p.model_year,
-                    list_price = p.list_price
-                }).ToListAsync();
-
-                return Json(new
-                {
-                    success = true,
-                    products = result
-                }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error filtering products: " + ex.Message
-                }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        
-        [HttpGet]
-        public async Task<ActionResult> GetStaffOrders(int staffId)
-        {
-            try
-            {
-                var orders = await db.orders
-                    .Where(o => o.staff_id == staffId)
-                    .Include(o => o.customers)
-                    .OrderByDescending(o => o.order_date)
-                    .Take(10) 
-                    .Select(o => new
-                    {
-                        order_id = o.order_id,
-                        customer_name = o.customers.first_name + " " + o.customers.last_name,
-                        order_date = o.order_date,
-                        order_status = o.order_status
-                    })
-                    .ToListAsync();
-
-                return Json(new
-                {
-                    success = true,
-                    orders = orders
-                }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error loading staff orders: " + ex.Message
-                }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        
-        [HttpGet]
-        public async Task<ActionResult> GetCustomerOrders(int customerId)
-        {
-            try
-            {
-                var orders = await db.orders
-                    .Where(o => o.customer_id == customerId)
-                    .Include(o => o.stores)
-                    .OrderByDescending(o => o.order_date)
-                    .Take(10) 
-                    .Select(o => new
-                    {
-                        order_id = o.order_id,
-                        store_name = o.stores.store_name,
-                        order_date = o.order_date,
-                        order_status = o.order_status
-                    })
-                    .ToListAsync();
-
-                return Json(new
-                {
-                    success = true,
-                    orders = orders
-                }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error loading customer orders: " + ex.Message
-                }, JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        
-        [HttpGet]
-        public async Task<ActionResult> GetProductDetails(int productId)
-        {
-            try
-            {
-                var product = await db.products
-                    .Include(p => p.brands)
-                    .Include(p => p.categories)
-                    .Where(p => p.product_id == productId)
-                    .Select(p => new
-                    {
-                        product_id = p.product_id,
-                        product_name = p.product_name,
-                        brand_name = p.brands.brand_name,
-                        brand_id = p.brand_id,
-                        category_name = p.categories.category_name,
-                        category_id = p.category_id,
-                        model_year = p.model_year,
-                        list_price = p.list_price
-                    })
-                    .FirstOrDefaultAsync();
-
-                if (product == null)
-                {
-                    return Json(new
-                    {
-                        success = false,
-                        message = "Product not found"
-                    }, JsonRequestBehavior.AllowGet);
-                }
-
-                return Json(new
-                {
-                    success = true,
-                    product = product
-                }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    success = false,
-                    message = "Error loading product details: " + ex.Message
-                }, JsonRequestBehavior.AllowGet);
             }
         }
 

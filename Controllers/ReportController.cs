@@ -15,11 +15,11 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        public ActionResult Index()
+        public async Task<ActionResult> Index()
         {
             try
             {
-                var popularProducts = db.order_items
+                var popularProducts = await db.order_items
                     .GroupBy(oi => oi.product_id)
                     .Select(g => new
                     {
@@ -28,16 +28,16 @@ namespace u22710362_HW03.Controllers
                     })
                     .OrderByDescending(x => x.TotalOrders)
                     .Take(10)
-                    .ToList();
+                    .ToListAsync();
 
                 var reportData = new List<ReportDataItem>();
 
                 foreach (var item in popularProducts)
                 {
-                    var product = db.products
+                    var product = await db.products
                         .Include(p => p.brands)
                         .Include(p => p.categories)
-                        .FirstOrDefault(p => p.product_id == item.ProductId);
+                        .FirstOrDefaultAsync(p => p.product_id == item.ProductId);
 
                     if (product != null)
                     {
@@ -52,10 +52,9 @@ namespace u22710362_HW03.Controllers
                 }
 
                 ViewBag.ReportData = JsonConvert.SerializeObject(reportData);
-                ViewBag.TotalProducts = db.products.Count();
-                ViewBag.TotalOrders = db.orders.Count();
-                ViewBag.TotalCustomers = db.customers.Count();
-
+                ViewBag.TotalProducts = await db.products.CountAsync();
+                ViewBag.TotalOrders = await db.orders.CountAsync();
+                ViewBag.TotalCustomers = await db.customers.CountAsync();
                 var filesPath = Server.MapPath("~/Reports");
                 if (!Directory.Exists(filesPath))
                 {
@@ -84,6 +83,9 @@ namespace u22710362_HW03.Controllers
                 ViewBag.ErrorMessage = "Error loading report: " + ex.Message;
                 ViewBag.ReportData = "[]";
                 ViewBag.SavedFiles = new List<SavedFileInfo>();
+                ViewBag.TotalProducts = 0;
+                ViewBag.TotalOrders = 0;
+                ViewBag.TotalCustomers = 0;
                 return View();
             }
         }
@@ -100,21 +102,17 @@ namespace u22710362_HW03.Controllers
                 {
                     Directory.CreateDirectory(filesPath);
                 }
-
                 fileName = fileName?.Trim();
                 if (string.IsNullOrEmpty(fileName))
                 {
                     fileName = "Report";
                 }
-
                 foreach (char c in Path.GetInvalidFileNameChars())
                 {
                     fileName = fileName.Replace(c, '_');
                 }
-
                 var fullFileName = $"{fileName}_{DateTime.Now:yyyyMMddHHmmss}.{fileType}";
                 var filePath = Path.Combine(filesPath, fullFileName);
-
                 if (fileType.ToLower() == "html")
                 {
                     System.IO.File.WriteAllText(filePath, reportHtml);
@@ -127,8 +125,6 @@ namespace u22710362_HW03.Controllers
                     plainText = System.Text.RegularExpressions.Regex.Replace(plainText, @"\s*\n\s*", "\n");
                     System.IO.File.WriteAllText(filePath, plainText);
                 }
-
-  
                 if (!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
                 {
                     var descriptionPath = Path.Combine(filesPath, fullFileName + ".description.txt");
@@ -159,11 +155,13 @@ namespace u22710362_HW03.Controllers
                     return File(fileBytes, contentType, fileName);
                 }
 
-                return HttpNotFound("File not found");
+                TempData["ErrorMessage"] = "File not found";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                return Content("Error downloading file: " + ex.Message);
+                TempData["ErrorMessage"] = "Error downloading file: " + ex.Message;
+                return RedirectToAction("Index");
             }
         }
 
@@ -179,6 +177,7 @@ namespace u22710362_HW03.Controllers
                 if (System.IO.File.Exists(filePath))
                 {
                     System.IO.File.Delete(filePath);
+
                     var descriptionPath = filePath + ".description.txt";
                     if (System.IO.File.Exists(descriptionPath))
                     {
@@ -196,28 +195,6 @@ namespace u22710362_HW03.Controllers
             {
                 TempData["ErrorMessage"] = "Error deleting file: " + ex.Message;
                 return RedirectToAction("Index");
-            }
-        }
-
-        [HttpGet]
-        public ActionResult GetFileDescription(string fileName)
-        {
-            try
-            {
-                var filesPath = Server.MapPath("~/Reports");
-                var descriptionPath = Path.Combine(filesPath, fileName + ".description.txt");
-
-                if (System.IO.File.Exists(descriptionPath))
-                {
-                    var description = System.IO.File.ReadAllText(descriptionPath);
-                    return Json(new { success = true, description = description }, JsonRequestBehavior.AllowGet);
-                }
-
-                return Json(new { success = true, description = "" }, JsonRequestBehavior.AllowGet);
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
