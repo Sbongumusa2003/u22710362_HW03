@@ -14,7 +14,6 @@ namespace u22710362_HW03.Controllers
     {
         private BikeStoresEntities db = new BikeStoresEntities();
 
-        // GET: Home/Index with optional filters
         public async Task<ActionResult> Index(int? brandFilter, int? categoryFilter)
         {
             try
@@ -23,11 +22,9 @@ namespace u22710362_HW03.Controllers
                 ViewBag.Categories = await db.categories.OrderBy(c => c.category_name).ToListAsync();
                 ViewBag.Stores = await db.stores.OrderBy(s => s.store_name).ToListAsync();
 
-                // Store current filter values
                 ViewBag.BrandFilter = brandFilter;
                 ViewBag.CategoryFilter = categoryFilter;
 
-                // Build products query with filters
                 var productsQuery = db.products
                     .Include(p => p.brands)
                     .Include(p => p.categories)
